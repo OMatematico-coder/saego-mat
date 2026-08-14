@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <link rel="manifest" href="manifest.json">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulado Online v2.0 - Missões Expandidas</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --bg: #f3f4f6;
+            --surface: #ffffff;
+            --text: #1f2937;
+            --answered: #10b981;
+            --unanswered: #e5e7eb;
+            --active: #3b82f6;
+            --locked: #d1d5db;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .container { background-color: var(--surface); max-width: 1400px; width: 98%; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column; min-height: 650px; }
+        .screen { display: none; padding: 40px; flex: 1; }
+        .screen.active { display: flex; flex-direction: column; }
+        
+        .header-text { text-align: center; margin-bottom: 30px; position: relative; }
+        .input-group { margin-bottom: 20px; max-width: 400px; margin-left: auto; margin-right: auto; width: 100%; }
+        .input-group label { display: block; margin-bottom: 8px; font-weight: 600; }
+        .input-group input, .input-group select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; }
+        button.btn-primary { background-color: var(--primary); color: white; border: none; padding: 14px 24px; font-size: 16px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; max-width: 400px; margin: 0 auto; display: block; transition: 0.2s; }
+        button.btn-primary:hover { background-color: #1d4ed8; }
+        .spinner { border: 4px solid rgba(0,0,0,0.1); width: 40px; height: 40px; border-radius: 50%; border-left-color: var(--primary); animation: spin 1s linear infinite; margin: 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* Dashboard Cards Verticais */
+        .dash-header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px; }
+        .btn-logout { background: #ef4444; color: white; border: none; padding: 8px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-logout:hover { background: #dc2626; }
+        
+        .dash-cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .dash-card { height: 350px; border-radius: 12px; display: flex; flex-direction: column; justify-content: flex-end; padding: 25px; color: white; font-size: 24px; font-weight: bold; cursor: pointer; transition: 0.3s; position: relative; overflow: hidden; background-color: var(--primary); background-size: cover; background-position: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .dash-card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.1)); z-index: 1; }
+        .dash-card span { position: relative; z-index: 2; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .dash-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.2); }
+
+        .themes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 20px; }
+        .theme-card { padding: 25px 15px; background: var(--primary); color: white; border-radius: 8px; text-align: center; cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 140px;}
+        .theme-card:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(37, 99, 235, 0.3); }
+        .theme-card.locked { background: var(--locked); color: #6b7280; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* Arvore de Missões (Map) */
+        .map-container { display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 30px 0; position: relative; }
+        .map-container::before { content: ""; position: absolute; top: 30px; bottom: 30px; left: 50%; transform: translateX(-50%); width: 4px; background: #e5e7eb; z-index: 0; }
+        .map-node { position: relative; z-index: 1; width: 100%; max-width: 400px; display: flex; align-items: center; background: white; border: 2px solid var(--primary); border-radius: 50px; padding: 10px 20px; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .map-node:hover { transform: scale(1.02); }
+        .map-node.locked { border-color: #d1d5db; background: #f9fafb; cursor: not-allowed; color: #9ca3af; }
+        .map-node.passed { border-color: #10b981; background: #ecfdf5; }
+        .node-icon { width: 40px; height: 40px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 15px; font-size: 18px; }
+        .map-node.locked .node-icon { background: #d1d5db; }
+        .map-node.passed .node-icon { background: #10b981; }
+        .node-info { flex: 1; }
+        .node-title { font-weight: bold; font-size: 16px; }
+        .node-status { font-size: 13px; color: #6b7280; }
+
+        /* Conquistas (Ajustado para o novo design interno) */
+        .trophy-card { background: white; border: 1px solid #e5e7eb; border-radius: 12px; margin-top: 20px; padding: 25px 20px; display: flex; flex-direction: column; align-items: center; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.03); min-height: 260px; }
+        .trophy-badge { width: 90px; height: 90px; object-fit: contain; margin-bottom: 20px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); }
+        .fase-badge-list { width: 100%; margin-top: auto; display: flex; flex-direction: column; gap: 8px; }
+        .fase-badge { background: #f3f4f6; border-radius: 6px; padding: 10px 15px; font-size: 14px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; color: var(--text); }
+        
+        /* Ranking (Aumento do tamanho das medalhas) */
+        .ranking-row { display: flex; align-items: center; justify-content: space-between; padding: 15px; background: white; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 10px; }
+        .ranking-name { width: 120px; font-weight: bold; font-size: 16px; color: var(--text); }
+        .ranking-medals { flex: 1; display: flex; gap: 12px; flex-wrap: wrap; justify-content: flex-start; padding: 0 15px; }
+        .medal-item { display: flex; flex-direction: column; align-items: center; }
+        .medal-icon-img { width: 45px; height: 45px; object-fit: contain; } /* <-- Medalhas Maiores aqui */
+        .medal-count { font-size: 13px; color: #6b7280; margin-top: 4px; font-weight: bold; }
+        .ranking-score { font-size: 24px; font-weight: bold; color: var(--text); width: 80px; text-align: right; }
+
+        /* Simulado e KPIs admin (Mantidos intactos) */
+        .exam-layout { display: flex; flex: 1; flex-direction: row; gap: 20px; }
+        @media (max-width: 768px) { .exam-layout { flex-direction: column-reverse; } }
+        .sidebar { width: 250px; background: #f9fafb; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb; display: flex; flex-direction: column; }
+        @media (max-width: 768px) { .sidebar { width: 100%; } }
+        .grid-questoes { display: grid; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); gap: 10px; margin-bottom: 20px; }
+        .box-questao { height: 40px; display: flex; align-items: center; justify-content: center; background-color: var(--unanswered); border-radius: 6px; font-weight: bold; cursor: pointer; color: #4b5563; transition: 0.2s; }
+        .box-questao.respondida { background-color: var(--answered); color: white; }
+        .box-questao.atual { border: 3px solid var(--active); }
+        .main-content { flex: 1; display: flex; flex-direction: column; }
+        .question-header { font-size: 20px; font-weight: bold; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center;}
+        .tema-badge { background: #e0e7ff; color: var(--primary); padding: 4px 12px; border-radius: 20px; font-size: 14px; }
+        .question-image-container { flex: 1; text-align: center; margin-bottom: 30px; background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px; min-height: 200px; display: flex; align-items: center; justify-content: center; }
+        .question-image-container img { max-width: 100%; max-height: 400px; object-fit: contain; }
+        .options-container { display: flex; gap: 15px; justify-content: center; margin-bottom: 30px; flex-wrap: wrap; }
+        .option-btn { width: 50px; height: 50px; font-size: 20px; font-weight: bold; background: white; border: 2px solid #ccc; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+        .option-btn:hover { border-color: var(--primary); color: var(--primary); }
+        .option-btn.selected { background-color: var(--primary); color: white; border-color: var(--primary); }
+        .nav-buttons { display: flex; justify-content: space-between; gap: 10px; margin-top: auto; }
+        .nav-buttons button { padding: 12px 20px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px; }
+        .btn-prev { background-color: #6b7280; color: white; }
+        .btn-next { background-color: var(--primary); color: white; }
+        .btn-finish { background-color: var(--answered); color: white; margin-top: auto; padding: 15px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; font-size: 14px; transition: 0.2s; }
+        .btn-finish:hover { background-color: #059669; }
+
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .kpi-card { background: white; padding: 20px; border-radius: 8px; border-left: 5px solid var(--primary); box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; }
+        .kpi-value { font-size: 28px; font-weight: bold; color: var(--text); margin-top: 10px; }
+        .kpi-label { font-size: 14px; color: #6b7280; text-transform: uppercase; letter-spacing: 1px; }
+        .admin-table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; border-radius: 8px; overflow: hidden; }
+        .admin-table th, .admin-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+        .admin-table th { background-color: var(--primary); color: white; }
+    </style>
+</head>
+<body>
+<div class="container">
+    
+    <!-- Tela 1: Login -->
+    <div id="screen-login" class="screen active">
+        <div class="header-text">
+            <h2>Simulado - Jornada de Aprendizado</h2>
+            <p>Faça login para continuar sua missão</p>
+        </div>
+        <div class="input-group">
+            <label>Usuário:</label>
+            <input type="text" id="login-usuario" placeholder="Digite seu usuário" required autocomplete="off">
+        </div>
+        <div class="input-group">
+            <label>Senha:</label>
+            <input type="password" id="login-senha" placeholder="Digite sua senha" required>
+        </div>
+        <button class="btn-primary" onclick="fazerLogin()">Entrar</button>
+        <p style="text-align: center; margin-top: 15px; font-size: 14px;">
+            Não tem uma conta? <a href="javascript:void(0);" onclick="mudarTela('screen-register')" style="color: var(--primary); text-decoration: none; font-weight: bold;">Cadastre-se aqui</a>
+        </p>
+    </div>
+
+    <!-- Tela 1.5: Cadastro -->
+    <div id="screen-register" class="screen">
+        <div class="header-text"><h2>Novo Recruta</h2><p>Preencha seus dados para entrar no ranking</p></div>
+        <div class="input-group"><label>Nome Completo:</label><input type="text" id="cad-nome" required></div>
+        <div class="input-group"><label>Série/Turma:</label>
+            <select id="cad-turma" required>
+                <option value="" disabled selected>Selecione a turma...</option>
+                <option value="9º Ano - A">9º Ano - A</option>
+                <option value="9º Ano - B">9º Ano - B</option>
+            </select>
+        </div>
+        <div class="input-group"><label>Criar Usuário:</label><input type="text" id="cad-usuario" required></div>
+        <div class="input-group"><label>Criar Senha:</label><input type="password" id="cad-senha" required></div>
+        <button class="btn-primary" onclick="fazerCadastro()" id="btn-cad">Criar Conta</button>
+        <p style="text-align: center; margin-top: 15px; font-size: 14px;"><a href="javascript:void(0);" onclick="mudarTela('screen-login')">Voltar ao Login</a></p>
+    </div>
+
+    <!-- Tela 2: Loading -->
+    <div id="screen-loading" class="screen">
+        <div class="header-text"><h2 id="loading-msg">Acessando...</h2><div class="spinner"></div></div>
+    </div>
+
+    <!-- Tela 3: Dashboard Principal -->
+    <div id="screen-dashboard" class="screen">
+        <div class="dash-header-bar">
+            <h2 id="dash-title">Bem-vindo!</h2>
+            <button class="btn-logout" onclick="fazerLogout()">Sair da Conta</button>
+        </div>
+        
+        <div class="dash-cards-grid">
+            <!-- Insira os links locais das suas imagens na propriedade url() -->
+            <div class="dash-card" style="background-image: url('capa_missoes.jpg');" onclick="renderizarGradeDeTemas()">
+                <span>🚀 Explorar Missões</span>
+            </div>
+            <div class="dash-card" style="background-image: url('capa_conquistas.jpg');" onclick="renderizarTrofeus()">
+                <span>🏆 Minhas Conquistas</span>
+            </div>
+            <div class="dash-card" style="background-image: url('capa_ranking.jpg');" onclick="carregarRanking()">
+                <span>📊 Ranking da Turma</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tela 3.1: Seleção de Temas -->
+    <div id="screen-themes" class="screen">
+        <div class="header-text"><h2>Escolha o Tema</h2><p>Selecione um tema liberado para ver as missões disponíveis.</p></div>
+        <div class="themes-grid" id="themes-grid"></div>
+        <button class="btn-primary" onclick="mudarTela('screen-dashboard')" style="margin-top: 30px; background-color: #6b7280; width: 200px;">Voltar ao Menu</button>
+    </div>
+
+    <!-- Tela 3.1.5: Mapa de Ramificações (Missões e Extras) -->
+    <div id="screen-map" class="screen">
+        <div class="header-text">
+            <h2 id="map-title">Ramificações da Missão</h2>
+            <p>Complete a Fase 1 para avançar de nível. Fases extras garantem mais prêmios!</p>
+        </div>
+        <div class="map-container" id="map-container"></div>
+        <button class="btn-primary" onclick="renderizarGradeDeTemas()" style="margin-top: 30px; background-color: #6b7280; width: 200px;">Voltar aos Temas</button>
+    </div>
+
+    <!-- Tela 3.2: Galeria de Troféus -->
+    <div id="screen-trophies" class="screen">
+        <div class="header-text"><h2>Galeria de Conquistas</h2><p>Acompanhe seu desempenho em cada fase.</p></div>
+        <div class="themes-grid" id="trophies-grid" style="gap: 25px; margin-top: 30px;"></div>
+        <button class="btn-primary" onclick="mudarTela('screen-dashboard')" style="margin-top: 40px; background-color: #6b7280; width: 200px;">Voltar ao Menu</button>
+    </div>
+
+    <!-- Tela 3.3: Ranking -->
+    <div id="screen-ranking" class="screen">
+        <div class="header-text">
+            <h2>Quadro de Medalhas</h2>
+            <!-- Novo Filtro de Turmas -->
+            <div style="margin-top: 15px;">
+                <select id="filtro-ranking" onchange="carregarRanking(this.value)" style="padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 16px; font-weight: bold; color: var(--text); background: white; cursor: pointer; max-width: 300px;">
+                    <option value="9º Ano - A">9º Ano - A</option>
+                    <option value="9º Ano - B">9º Ano - B</option>
+                    <option value="Todas">🏆 Todas as Turmas</option>
+                </select>
+            </div>
+        </div>
+        <div id="ranking-list" style="max-width: 750px; margin: 0 auto; width: 100%;"></div>
+        <button class="btn-primary" onclick="mudarTela('screen-dashboard')" style="margin-top: 30px; background-color: #6b7280; width: 200px;">Voltar ao Menu</button>
+    </div>
+
+    <!-- Tela 4: Simulado -->
+    <div id="screen-exam" class="screen">
+        <div class="exam-layout">
+            <div class="sidebar">
+                <h3 style="margin-bottom: 15px; text-align: center;">Progresso</h3>
+                <div class="grid-questoes" id="grid-navegacao"></div>
+                <button class="btn-finish" onclick="finalizarSimulado()">Finalizar Etapa</button>
+            </div>
+            <div class="main-content">
+                <div class="question-header">
+                    <span id="titulo-questao">Questão 1</span>
+                    <span class="tema-badge" id="badge-tema">Tema</span>
+                </div>
+                <div class="question-image-container"><img id="imagem-questao" src="" alt="Questão"></div>
+                <div class="options-container" id="container-alternativas">
+                    <button class="option-btn" onclick="selecionarAlternativa('A')">A</button>
+                    <button class="option-btn" onclick="selecionarAlternativa('B')">B</button>
+                    <button class="option-btn" onclick="selecionarAlternativa('C')">C</button>
+                    <button class="option-btn" onclick="selecionarAlternativa('D')">D</button>
+                    <button class="option-btn" onclick="selecionarAlternativa('E')">E</button>
+                </div>
+                <div class="nav-buttons">
+                    <button class="btn-prev" onclick="navegar(-1)">Anterior</button>
+                    <button class="btn-next" onclick="navegar(1)">Próxima</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tela 5: Conclusão -->
+    <div id="screen-end" class="screen">
+        <div class="header-text">
+            <h2>Missão Concluída!</h2>
+            <p id="msg-envio" style="margin-top: 15px; font-size: 18px;">Enviando relatório...</p>
+            <div class="spinner" id="end-spinner"></div>
+            <button class="btn-primary" id="btn-voltar-dash" style="display:none; margin-top: 30px;" onclick="mudarTela('screen-dashboard')">Voltar ao Menu Principal</button>
+        </div>
+    </div>
+
+    <!-- Tela Professor -->
+    <div id="screen-admin" class="screen">
+        <div class="dash-header-bar">
+            <h2>Painel Pedagógico</h2>
+            <button class="btn-logout" onclick="fazerLogout()">Sair do Painel</button>
+        </div>
+        <div class="kpi-grid">
+            <div class="kpi-card"><div class="kpi-label">Alunos Ativos</div><div class="kpi-value" id="kpi-alunos">--</div></div>
+            <div class="kpi-card" style="border-left-color: #f59e0b;"><div class="kpi-label">Provas Realizadas</div><div class="kpi-value" id="kpi-provas">--</div></div>
+            <div class="kpi-card" style="border-left-color: #10b981;"><div class="kpi-label">Média Global</div><div class="kpi-value" id="kpi-media">--</div></div>
+        </div>
+        <h3 style="margin-bottom: 15px; border-bottom: 2px solid #e5e7eb; padding-bottom: 5px;">Proficiência por Tema</h3>
+        <div class="themes-grid" id="kpi-descritores" style="margin-bottom: 30px;"></div>
+        <h3 style="margin-bottom: 15px; border-bottom: 2px solid #e5e7eb; padding-bottom: 5px;">Últimas Atividades</h3>
+        <div style="overflow-x: auto;">
+            <table class="admin-table">
+                <thead><tr><th>Data</th><th>Aluno</th><th>Turma</th><th>Tema</th><th>Nota</th></tr></thead>
+                <tbody id="kpi-tabela-atividades"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    // =========================================================
+    // CONFIGURAÇÕES DO PROFESSOR
+    // =========================================================
+    const URL_GOOGLE_SCRIPT = "https://script.google.com/macros/s/AKfycbwt1lmARd7SeHFhb7jOmrhPwxbffIIadggWe5P3i-r1cedBvvDNbuWHOiMw2e8o5A8tuQ/exec";
+
+    const configuracaoTemas = [
+        { nivel: 1, id: "D36", nome: "Resolver problema com informações em gráficos ou tabelas", qtd_questoes: 8 },
+
+        { nivel: 2, id: "D28", nome: "Resolver problema com porcentagem", qtd_questoes: 8 },
+
+        { nivel: 3, id: "D26", nome: "Resolver problema com números racionais", qtd_questoes: 8 },
+
+	{ nivel: 4, id: "D13", nome: "Resolver problema envolvendo área", qtd_questoes: 8 },
+
+	{ nivel: 16, id: "D16", nome: "Identificar a localização de números inteiros na reta numérica", qtd_questoes: 7 },
+
+        { nivel: 17, id: "D34", nome: "Identificar um sistema de equações do 1º grau", qtd_questoes: 6 },
+
+        { nivel: 18, id: "D08", nome: "Efetuar cálculos com números inteiros", qtd_questoes: 5 },
+
+	{ nivel: 19, id: "D22", nome: "Identificar fração como representação associada a diferentes significados.", qtd_questoes: 6 },
+
+        { nivel: 20, id: "D02", nome: "Identificar e relacionar planificações", qtd_questoes: 6 },
+
+        { nivel: 21, id: "D03", nome: "Identificar propriedades de triângulos", qtd_questoes: 5 },
+
+	{ nivel: 22, id: "D33", nome: "Identificar uma equação ou inequação do 1º grau", qtd_questoes: 6 },
+
+        { nivel: 24, id: "D18", nome: "Efetuar cálculos com números inteiros", qtd_questoes: 5 },
+
+	{ nivel: 25, id: "D23", nome: "Identificar frações equivalentes", qtd_questoes: 4 }
+
+    ];
+
+    const bancoGeral = [
+ 	    { id: "M00132109", tema: "D36", url: "imagens/D36/M00132109.png", gabarito: "D" },
+{ id: "M00143485", tema: "D36", url: "imagens/D36/M00143485.png", gabarito: "B" },
+{ id: "M00179088", tema: "D36", url: "imagens/D36/M00179088.png", gabarito: "B" },
+{ id: "M091742H6", tema: "D36", url: "imagens/D36/M091742H6.png", gabarito: "C" },
+{ id: "M031779E4", tema: "D36", url: "imagens/D36/M031779E4.png", gabarito: "B" },
+{ id: "M018577", tema: "D36", url: "imagens/D36/M018577.png", gabarito: "B" },
+{ id: "M07467517", tema: "D36", url: "imagens/D36/M07467517.png", gabarito: "B" },
+{ id: "M090970E4", tema: "D36", url: "imagens/D36/M090970E4.png", gabarito: "D" },
+{ id: "M00179152", tema: "D36", url: "imagens/D36/M00179152.png", gabarito: "D" },
+{ id: "M016758", tema: "D36", url: "imagens/D36/M016758.png", gabarito: "D" },
+{ id: "M017772", tema: "D36", url: "imagens/D36/M017772.png", gabarito: "B" },
+{ id: "M018485", tema: "D36", url: "imagens/D36/M018485.png", gabarito: "C" },
+{ id: "M024851", tema: "D36", url: "imagens/D36/M024851.png", gabarito: "A" },
+{ id: "M030158BH", tema: "D36", url: "imagens/D36/M030158BH.png", gabarito: "A" },
+{ id: "M04596117", tema: "D36", url: "imagens/D36/M04596117.png", gabarito: "D" },
+{ id: "M051222H6", tema: "D36", url: "imagens/D36/M051222H6.png", gabarito: "D" },
+{ id: "M051292H6", tema: "D36", url: "imagens/D36/M051292H6.png", gabarito: "B" },
+{ id: "M051323H6", tema: "D36", url: "imagens/D36/M051323H6.png", gabarito: "C" },
+{ id: "M060025E4", tema: "D36", url: "imagens/D36/M060025E4.png", gabarito: "A" },
+{ id: "M06076717", tema: "D36", url: "imagens/D36/M06076717.png", gabarito: "C" },
+{ id: "M06229617", tema: "D36", url: "imagens/D36/M06229617.png", gabarito: "D" },
+{ id: "M070264E4", tema: "D36", url: "imagens/D36/M070264E4.png", gabarito: "D" },
+{ id: "M070809H6", tema: "D36", url: "imagens/D36/M070809H6.png", gabarito: "A" },
+{ id: "M080429E4", tema: "D36", url: "imagens/D36/M080429E4.png", gabarito: "B" },
+{ id: "M09060381", tema: "D36", url: "imagens/D36/M09060381.png", gabarito: "A" },
+{ id: "M091525H6", tema: "D36", url: "imagens/D36/M091525H6.png", gabarito: "D" },
+{ id: "M00030748", tema: "D36", url: "imagens/D36/M00030748.png", gabarito: "C" },
+{ id: "M00030813", tema: "D36", url: "imagens/D36/M00030813.png", gabarito: "A" },
+{ id: "M00034566", tema: "D36", url: "imagens/D36/M00034566.png", gabarito: "A" },
+{ id: "M00034567", tema: "D36", url: "imagens/D36/M00034567.png", gabarito: "C" },
+{ id: "M00034568", tema: "D36", url: "imagens/D36/M00034568.png", gabarito: "C" },
+{ id: "M00039140", tema: "D36", url: "imagens/D36/M00039140.png", gabarito: "C" },
+{ id: "M00048465", tema: "D36", url: "imagens/D36/M00048465.png", gabarito: "C" },
+{ id: "M00085540", tema: "D36", url: "imagens/D36/M00085540.png", gabarito: "D" },
+{ id: "M00095925", tema: "D36", url: "imagens/D36/M00095925.png", gabarito: "D" },
+{ id: "M00102322", tema: "D36", url: "imagens/D36/M00102322.png", gabarito: "D" },
+{ id: "M00131714", tema: "D36", url: "imagens/D36/M00131714.png", gabarito: "C" },
+{ id: "M00132085", tema: "D36", url: "imagens/D36/M00132085.png", gabarito: "C" },
+
+
+    
+{ id: "M00030804", tema: "D28", url: "imagens/D28/M00030804.png", gabarito: "B" },
+{ id: "M00034541", tema: "D28", url: "imagens/D28/M00034541.png", gabarito: "A" },
+{ id: "M00179185", tema: "D28", url: "imagens/D28/M00179185.png", gabarito: "B" },
+{ id: "M05202017", tema: "D28", url: "imagens/D28/M05202017.png", gabarito: "D" },
+{ id: "M00034090", tema: "D28", url: "imagens/D28/M00034090.png", gabarito: "B" },
+{ id: "M00034096", tema: "D28", url: "imagens/D28/M00034096.png", gabarito: "C" },
+{ id: "M00044073", tema: "D28", url: "imagens/D28/M00044073.png", gabarito: "B" },
+{ id: "M00059737", tema: "D28", url: "imagens/D28/M00059737.png", gabarito: "D" },
+{ id: "M00080037", tema: "D28", url: "imagens/D28/M00080037.png", gabarito: "B" },
+{ id: "M00102361", tema: "D28", url: "imagens/D28/M00102361.png", gabarito: "D" },
+{ id: "M00102386", tema: "D28", url: "imagens/D28/M00102386.png", gabarito: "C" },
+{ id: "M00131701", tema: "D28", url: "imagens/D28/M00131701.png", gabarito: "C" },
+{ id: "M00131710", tema: "D28", url: "imagens/D28/M00131710.png", gabarito: "B" },
+{ id: "M00143483", tema: "D28", url: "imagens/D28/M00143483.png", gabarito: "A" },
+{ id: "M00179143", tema: "D28", url: "imagens/D28/M00179143.png", gabarito: "C" },
+{ id: "M00179161", tema: "D28", url: "imagens/D28/M00179161.png", gabarito: "C" },
+{ id: "M008360", tema: "D28", url: "imagens/D28/M008360.png", gabarito: "A" },
+{ id: "M013360", tema: "D28", url: "imagens/D28/M013360.png", gabarito: "B" },
+{ id: "M013361", tema: "D28", url: "imagens/D28/M013361.png", gabarito: "A" },
+{ id: "M015499", tema: "D28", url: "imagens/D28/M015499.png", gabarito: "D" },
+{ id: "M017802", tema: "D28", url: "imagens/D28/M017802.png", gabarito: "C" },
+{ id: "M017812", tema: "D28", url: "imagens/D28/M017812.png", gabarito: "B" },
+{ id: "M050088CE", tema: "D28", url: "imagens/D28/M050088CE.png", gabarito: "C" },
+{ id: "M050225H6", tema: "D28", url: "imagens/D28/M050225H6.png", gabarito: "C" },
+{ id: "M050587ES", tema: "D28", url: "imagens/D28/M050587ES.png", gabarito: "D" },
+{ id: "M050602H6", tema: "D28", url: "imagens/D28/M050602H6.png", gabarito: "B" },
+{ id: "M070790H6", tema: "D28", url: "imagens/D28/M070790H6.png", gabarito: "A" },
+{ id: "M07354217", tema: "D28", url: "imagens/D28/M07354217.png", gabarito: "B" },
+{ id: "M08047017", tema: "D28", url: "imagens/D28/M08047017.png", gabarito: "C" },
+{ id: "M080648H6", tema: "D28", url: "imagens/D28/M080648H6.png", gabarito: "B" },
+{ id: "M090113H6", tema: "D28", url: "imagens/D28/M090113H6.png", gabarito: "D" },
+{ id: "M090561H6", tema: "D28", url: "imagens/D28/M090561H6.png", gabarito: "C" },
+{ id: "M091732H6", tema: "D28", url: "imagens/D28/M091732H6.png", gabarito: "B" },
+{ id: "M091897H6", tema: "D28", url: "imagens/D28/M091897H6.png", gabarito: "C" },
+
+
+{ id: "M05107817", tema: "D26", url: "imagens/D26/M05107817.png", gabarito: "A" },
+{ id: "M00030825", tema: "D26", url: "imagens/D26/M00030825.png", gabarito: "C" },
+{ id: "M00030859", tema: "D26", url: "imagens/D26/M00030859.png", gabarito: "B" },
+{ id: "M00030864", tema: "D26", url: "imagens/D26/M00030864.png", gabarito: "A" },
+{ id: "M00037704", tema: "D26", url: "imagens/D26/M00037704.png", gabarito: "A" },
+{ id: "M00038186", tema: "D26", url: "imagens/D26/M00038186.png", gabarito: "A" },
+{ id: "M00059963", tema: "D26", url: "imagens/D26/M00059963.png", gabarito: "A" },
+{ id: "M00099068", tema: "D26", url: "imagens/D26/M00099068.png", gabarito: "D" },
+{ id: "M00102377", tema: "D26", url: "imagens/D26/M00102377.png", gabarito: "D" },
+{ id: "M00102381", tema: "D26", url: "imagens/D26/M00102381.png", gabarito: "C" },
+{ id: "M00131289", tema: "D26", url: "imagens/D26/M00131289.png", gabarito: "A" },
+{ id: "M00131700", tema: "D26", url: "imagens/D26/M00131700.png", gabarito: "D" },
+{ id: "M00131709", tema: "D26", url: "imagens/D26/M00131709.png", gabarito: "B" },
+{ id: "M00133255", tema: "D26", url: "imagens/D26/M00133255.png", gabarito: "A" },
+{ id: "M00143482", tema: "D26", url: "imagens/D26/M00143482.png", gabarito: "A" },
+{ id: "M015484", tema: "D26", url: "imagens/D26/M015484.png", gabarito: "D" },
+{ id: "M019373", tema: "D26", url: "imagens/D26/M019373.png", gabarito: "A" },
+{ id: "M019963", tema: "D26", url: "imagens/D26/M019963.png", gabarito: "B" },
+{ id: "M041449E4", tema: "D26", url: "imagens/D26/M041449E4.png", gabarito: "A" },
+{ id: "M04536SI", tema: "D26", url: "imagens/D26/M04536SI.png", gabarito: "A" },
+{ id: "M050073H6", tema: "D26", url: "imagens/D26/M050073H6.png", gabarito: "A" },
+{ id: "M05110417", tema: "D26", url: "imagens/D26/M05110417.png", gabarito: "C" },
+{ id: "M051236H6", tema: "D26", url: "imagens/D26/M051236H6.png", gabarito: "C" },
+{ id: "M060822H6", tema: "D26", url: "imagens/D26/M060822H6.png", gabarito: "A" },
+{ id: "M060889H6", tema: "D26", url: "imagens/D26/M060889H6.png", gabarito: "A" },
+{ id: "M070648H6", tema: "D26", url: "imagens/D26/M070648H6.png", gabarito: "D" },
+{ id: "M090266G5", tema: "D26", url: "imagens/D26/M090266G5.png", gabarito: "D" },
+{ id: "M090671ES", tema: "D26", url: "imagens/D26/M090671ES.png", gabarito: "B" },
+{ id: "M091806H6", tema: "D26", url: "imagens/D26/M091806H6.png", gabarito: "D" },
+
+
+{ id: "M00034944", tema: "D13", url: "imagens/D13/M00034944.png", gabarito: "A" },
+{ id: "M00138873", tema: "D13", url: "imagens/D13/M00138873.png", gabarito: "C" },
+{ id: "M00179176", tema: "D13", url: "imagens/D13/M00179176.png", gabarito: "C" },
+{ id: "M015488", tema: "D13", url: "imagens/D13/M015488.png", gabarito: "C" },
+{ id: "M023677", tema: "D13", url: "imagens/D13/M023677.png", gabarito: "B" },
+{ id: "M023692", tema: "D13", url: "imagens/D13/M023692.png", gabarito: "A" },
+{ id: "M00145773", tema: "D13", url: "imagens/D13/M00145773.png", gabarito: "C" },
+{ id: "M00179149", tema: "D13", url: "imagens/D13/M00179149.png", gabarito: "C" },
+{ id: "M00179168", tema: "D13", url: "imagens/D13/M00179168.png", gabarito: "C" },
+{ id: "M05001265", tema: "D13", url: "imagens/D13/M05001265.png", gabarito: "C" },
+{ id: "M050367H6", tema: "D13", url: "imagens/D13/M050367H6.png", gabarito: "D" },
+{ id: "M05118717", tema: "D13", url: "imagens/D13/M05118717.png", gabarito: "A" },
+{ id: "M051361H6", tema: "D13", url: "imagens/D13/M051361H6.png", gabarito: "B" },
+{ id: "M070653H6", tema: "D13", url: "imagens/D13/M070653H6.png", gabarito: "C" },
+{ id: "M070807H6", tema: "D13", url: "imagens/D13/M070807H6.png", gabarito: "D" },
+{ id: "M07388217", tema: "D13", url: "imagens/D13/M07388217.png", gabarito: "B" },
+{ id: "M080387E4", tema: "D13", url: "imagens/D13/M080387E4.png", gabarito: "D" },
+{ id: "M080652H6", tema: "D13", url: "imagens/D13/M080652H6.png", gabarito: "C" },
+{ id: "M090111ES", tema: "D13", url: "imagens/D13/M090111ES.png", gabarito: "A" },
+{ id: "M091560H6", tema: "D13", url: "imagens/D13/M091560H6.png", gabarito: "C" },
+{ id: "M091635H6", tema: "D13", url: "imagens/D13/M091635H6.png", gabarito: "A" },
+{ id: "M00030811", tema: "D13", url: "imagens/D13/M00030811.png", gabarito: "D" },
+{ id: "M00048463", tema: "D13", url: "imagens/D13/M00048463.png", gabarito: "B" },
+{ id: "M00098475", tema: "D13", url: "imagens/D13/M00098475.png", gabarito: "D" },
+{ id: "M00131696", tema: "D13", url: "imagens/D13/M00131696.png", gabarito: "B" },
+
+
+{ id: "M091915H6", tema: "D16", url: "imagens/D16/M091915H6.png", gabarito: "C" },
+{ id: "M090380H6", tema: "D16", url: "imagens/D16/M090380H6.png", gabarito: "D" },
+{ id: "M00179158", tema: "D16", url: "imagens/D16/M00179158.png", gabarito: "B" },
+{ id: "M013341", tema: "D16", url: "imagens/D16/M013341.png", gabarito: "B" },
+{ id: "M016784", tema: "D16", url: "imagens/D16/M016784.png", gabarito: "C" },
+{ id: "M016802", tema: "D16", url: "imagens/D16/M016802.png", gabarito: "C" },
+{ id: "M016811", tema: "D16", url: "imagens/D16/M016811.png", gabarito: "C" },
+{ id: "M016820", tema: "D16", url: "imagens/D16/M016820.png", gabarito: "B" },
+{ id: "M040149H6", tema: "D16", url: "imagens/D16/M040149H6.png", gabarito: "C" },
+{ id: "M07458117", tema: "D16", url: "imagens/D16/M07458117.png", gabarito: "B" },
+{ id: "M07458517", tema: "D16", url: "imagens/D16/M07458517.png", gabarito: "B" },
+{ id: "M080642H6", tema: "D16", url: "imagens/D16/M080642H6.png", gabarito: "A" },
+{ id: "M090093H6", tema: "D16", url: "imagens/D16/M090093H6.png", gabarito: "B" },
+{ id: "M091624H6", tema: "D16", url: "imagens/D16/M091624H6.png", gabarito: "D" },
+
+
+{ id: "M00034964", tema: "D34", url: "imagens/D34/M00034964.png", gabarito: "D" },
+{ id: "M023684", tema: "D34", url: "imagens/D34/M023684.png", gabarito: "A" },
+{ id: "M090330H6", tema: "D34", url: "imagens/D34/M090330H6.png", gabarito: "B" },
+{ id: "M09060317", tema: "D34", url: "imagens/D34/M09060317.png", gabarito: "B" },
+{ id: "M080445E4", tema: "D34", url: "imagens/D34/M080445E4.png", gabarito: "B" },
+{ id: "M090155E4", tema: "D34", url: "imagens/D34/M090155E4.png", gabarito: "C" },
+{ id: "M090254G5", tema: "D34", url: "imagens/D34/M090254G5.png", gabarito: "A" },
+{ id: "M091728H6", tema: "D34", url: "imagens/D34/M091728H6.png", gabarito: "C" },
+{ id: "M091802H6", tema: "D34", url: "imagens/D34/M091802H6.png", gabarito: "A" },
+{ id: "M00030851", tema: "D34", url: "imagens/D34/M00030851.png", gabarito: "A" },
+{ id: "M00076265", tema: "D34", url: "imagens/D34/M00076265.png", gabarito: "D" },
+{ id: "M00102336", tema: "D34", url: "imagens/D34/M00102336.png", gabarito: "A" },
+
+
+{ id: "M090259H6", tema: "D08", url: "imagens/D08/M090259H6.png", gabarito: "D" },
+{ id: "M023675", tema: "D08", url: "imagens/D08/M023675.png", gabarito: "C" },
+{ id: "M023683", tema: "D08", url: "imagens/D08/M023683.png", gabarito: "C" },
+{ id: "M080651H6", tema: "D08", url: "imagens/D08/M080651H6.png", gabarito: "C" },
+{ id: "M09053MG", tema: "D08", url: "imagens/D08/M09053MG.png", gabarito: "C" },
+{ id: "M090565H6", tema: "D08", url: "imagens/D08/M090565H6.png", gabarito: "B" },
+{ id: "M091811H6", tema: "D08", url: "imagens/D08/M091811H6.png", gabarito: "A" },
+{ id: "M00080534", tema: "D08", url: "imagens/D08/M00080534.png", gabarito: "C" },
+{ id: "M015495", tema: "D08", url: "imagens/D08/M015495.png", gabarito: "B" },
+{ id: "M09130917", tema: "D08", url: "imagens/D08/M09130917.png", gabarito: "D" },
+{ id: "PAMA08096MS", tema: "D08", url: "imagens/D08/PAMA08096MS.png", gabarito: "A" },
+
+
+{ id: "M090691H6", tema: "D22", url: "imagens/D22/M090691H6.png", gabarito: "C" },
+{ id: "M00039116", tema: "D22", url: "imagens/D22/M00039116.png", gabarito: "A" },
+{ id: "M00075757", tema: "D22", url: "imagens/D22/M00075757.png", gabarito: "B" },
+{ id: "M00133254", tema: "D22", url: "imagens/D22/M00133254.png", gabarito: "A" },
+{ id: "M018965", tema: "D22", url: "imagens/D22/M018965.png", gabarito: "A" },
+{ id: "M018966", tema: "D22", url: "imagens/D22/M018966.png", gabarito: "A" },
+{ id: "M018972", tema: "D22", url: "imagens/D22/M018972.png", gabarito: "A" },
+{ id: "M018973", tema: "D22", url: "imagens/D22/M018973.png", gabarito: "A" },
+{ id: "M018988", tema: "D22", url: "imagens/D22/M018988.png", gabarito: "A" },
+{ id: "M018991", tema: "D22", url: "imagens/D22/M018991.png", gabarito: "A" },
+{ id: "M050024A9", tema: "D22", url: "imagens/D22/M050024A9.png", gabarito: "A" },
+{ id: "M060061H6", tema: "D22", url: "imagens/D22/M060061H6.png", gabarito: "C" },
+{ id: "M060403H6", tema: "D22", url: "imagens/D22/M060403H6.png", gabarito: "B" },
+
+
+{ id: "M051572E4", tema: "D02", url: "imagens/D02/M051572E4.png", gabarito: "D" },
+{ id: "M090275H6", tema: "D02", url: "imagens/D02/M090275H6.png", gabarito: "D" },
+{ id: "M090821A9", tema: "D02", url: "imagens/D02/M090821A9.png", gabarito: "B" },
+{ id: "M090860A9", tema: "D02", url: "imagens/D02/M090860A9.png", gabarito: "B" },
+{ id: "M00059805", tema: "D02", url: "imagens/D02/M00059805.png", gabarito: "A" },
+{ id: "M00131704", tema: "D02", url: "imagens/D02/M00131704.png", gabarito: "A" },
+{ id: "M00145770", tema: "D02", url: "imagens/D02/M00145770.png", gabarito: "A" },
+{ id: "M051093H6", tema: "D02", url: "imagens/D02/M051093H6.png", gabarito: "A" },
+{ id: "M051288H6", tema: "D02", url: "imagens/D02/M051288H6.png", gabarito: "D" },
+{ id: "M05281817", tema: "D02", url: "imagens/D02/M05281817.png", gabarito: "D" },
+{ id: "M06217617", tema: "D02", url: "imagens/D02/M06217617.png", gabarito: "C" },
+{ id: "M070075H6", tema: "D02", url: "imagens/D02/M070075H6.png", gabarito: "D" },
+
+
+{ id: "M00039151", tema: "D03", url: "imagens/D03/M00039151.png", gabarito: "C" },
+{ id: "M090200G5", tema: "D03", url: "imagens/D03/M090200G5.png", gabarito: "B" },
+{ id: "M00059764", tema: "D03", url: "imagens/D03/M00059764.png", gabarito: "D" },
+{ id: "M00145771", tema: "D03", url: "imagens/D03/M00145771.png", gabarito: "B" },
+{ id: "M018449", tema: "D03", url: "imagens/D03/M018449.png", gabarito: "C" },
+{ id: "M06217717", tema: "D03", url: "imagens/D03/M06217717.png", gabarito: "B" },
+{ id: "M070503E4", tema: "D03", url: "imagens/D03/M070503E4.png", gabarito: "D" },
+{ id: "M070504E4", tema: "D03", url: "imagens/D03/M070504E4.png", gabarito: "C" },
+{ id: "M07479417", tema: "D03", url: "imagens/D03/M07479417.png", gabarito: "B" },
+{ id: "M080441E4", tema: "D03", url: "imagens/D03/M080441E4.png", gabarito: "D" },
+{ id: "M091568H6", tema: "D03", url: "imagens/D03/M091568H6.png", gabarito: "B" },
+
+
+{ id: "M00034962", tema: "D33", url: "imagens/D33/M00034962.png", gabarito: "D" },
+{ id: "M00179177", tema: "D33", url: "imagens/D33/M00179177.png", gabarito: "C" },
+{ id: "M019962", tema: "D33", url: "imagens/D33/M019962.png", gabarito: "B" },
+{ id: "M023667", tema: "D33", url: "imagens/D33/M023667.png", gabarito: "D" },
+{ id: "M07394417", tema: "D33", url: "imagens/D33/M07394417.png", gabarito: "D" },
+{ id: "M08054217", tema: "D33", url: "imagens/D33/M08054217.png", gabarito: "C" },
+{ id: "M090269H6", tema: "D33", url: "imagens/D33/M090269H6.png", gabarito: "B" },
+{ id: "M090708E4", tema: "D33", url: "imagens/D33/M090708E4.png", gabarito: "B" },
+{ id: "M00030854", tema: "D33", url: "imagens/D33/M00030854.png", gabarito: "C" },
+{ id: "M00030869", tema: "D33", url: "imagens/D33/M00030869.png", gabarito: "D" },
+{ id: "M008334", tema: "D33", url: "imagens/D33/M008334.png", gabarito: "D" },
+{ id: "M019368", tema: "D33", url: "imagens/D33/M019368.png", gabarito: "C" },
+
+
+{ id: "M00034199", tema: "D18", url: "imagens/D18/M00034199.png", gabarito: "D" },
+{ id: "M00034476", tema: "D18", url: "imagens/D18/M00034476.png", gabarito: "D" },
+{ id: "M00034478", tema: "D18", url: "imagens/D18/M00034478.png", gabarito: "A" },
+{ id: "M00102325", tema: "D18", url: "imagens/D18/M00102325.png", gabarito: "C" },
+{ id: "M070256E4", tema: "D18", url: "imagens/D18/M070256E4.png", gabarito: "C" },
+{ id: "M070538E4", tema: "D18", url: "imagens/D18/M070538E4.png", gabarito: "C" },
+{ id: "M080644H6", tema: "D18", url: "imagens/D18/M080644H6.png", gabarito: "D" },
+{ id: "M090259G5", tema: "D18", url: "imagens/D18/M090259G5.png", gabarito: "B" },
+{ id: "M09107617", tema: "D18", url: "imagens/D18/M09107617.png", gabarito: "A" },
+{ id: "M091565H6", tema: "D18", url: "imagens/D18/M091565H6.png", gabarito: "C" },
+
+
+{ id: "M019352", tema: "D23", url: "imagens/D23/M019352.png", gabarito: "D" },
+{ id: "M026892", tema: "D23", url: "imagens/D23/M026892.png", gabarito: "D" },
+{ id: "M026916", tema: "D23", url: "imagens/D23/M026916.png", gabarito: "D" },
+{ id: "M026928", tema: "D23", url: "imagens/D23/M026928.png", gabarito: "A" },
+{ id: "M030341", tema: "D23", url: "imagens/D23/M030341.png", gabarito: "B" },
+{ id: "M030353", tema: "D23", url: "imagens/D23/M030353.png", gabarito: "B" },
+{ id: "M030357", tema: "D23", url: "imagens/D23/M030357.png", gabarito: "A" },
+{ id: "M060085H6", tema: "D23", url: "imagens/D23/M060085H6.png", gabarito: "C" }
+
+    ];
+
+    const categoriasMedalhas = [
+        { nome: "Diamante", min: 10.0, img: "icones/1diamante.png", cor: "#22d3ee" },
+        { nome: "Ouro",     min: 8.50, img: "icones/3ouro.png",     cor: "#fbbf24" },
+        { nome: "Prata",    min: 6.00, img: "icones/2platina.png",    cor: "#e5e7eb" },
+        { nome: "Cobre",    min: 4.00, img: "icones/9cobre.png",    cor: "#d97706" },
+        { nome: "Ferro",    min: 0.00, img: "icones/10ferro.png",    cor: "#4b5563" }
+    ];
+
+    // =========================================================
+    // LÓGICA DA APLICAÇÃO
+    // =========================================================
+    let dadosAluno = { nome: "", turma: "", usuario: "" };
+    let nivelLiberadoAluno = 1;
+    let historicoAluno = {};
+    let temaAtual = null;
+    let faseAtualIndex = 1;
+    let provaSorteada = [];
+    let questaoAtualIndex = 0;
+    let respostasAluno = {}; 
+
+    function embaralhar(array) {
+        let cur = array.length, rnd;
+        while (cur !== 0) { rnd = Math.floor(Math.random() * cur); cur--; [array[cur], array[rnd]] = [array[rnd], array[cur]]; }
+        return array;
+    }
+
+    function fazerLogin() {
+        const u = document.getElementById('login-usuario').value.trim();
+        const s = document.getElementById('login-senha').value.trim();
+        if (!u || !s) return alert("Preencha usuário e senha.");
+        
+        mudarTela('screen-loading');
+        fetch(`${URL_GOOGLE_SCRIPT}?acao=login&usuario=${encodeURIComponent(u)}&senha=${encodeURIComponent(s)}`)
+        .then(r => r.json()).then(data => {
+            if (data.sucesso) {
+                if (data.isProfessor) return carregarPainelProfessor();
+                dadosAluno.nome = data.nome; dadosAluno.turma = data.turma; dadosAluno.usuario = u;
+                nivelLiberadoAluno = data.nivelLiberado || 1; 
+                historicoAluno = data.historicoNotas || {};
+                document.getElementById('dash-title').innerText = `Olá, ${data.nome.split(" ")[0]}!`;
+                mudarTela('screen-dashboard');
+            } else { alert(data.erro); mudarTela('screen-login'); }
+        }).catch(() => { alert("Erro de rede."); mudarTela('screen-login'); });
+    }
+
+    function fazerCadastro() {
+        const payload = { acao: "cadastrar", nome: document.getElementById('cad-nome').value, turma: document.getElementById('cad-turma').value, usuario: document.getElementById('cad-usuario').value, senha: document.getElementById('cad-senha').value };
+        fetch(URL_GOOGLE_SCRIPT, { method: 'POST', body: JSON.stringify(payload) }).then(r => r.json()).then(d => {
+            if (d.sucesso) { alert("Sucesso!"); mudarTela('screen-login'); } else alert(d.erro);
+        });
+    }
+
+    function fazerLogout() { dadosAluno = {}; mudarTela('screen-login'); }
+
+    // Seleção de Temas
+    function renderizarGradeDeTemas() {
+        mudarTela('screen-themes');
+        const grid = document.getElementById('themes-grid'); grid.innerHTML = "";
+        configuracaoTemas.forEach(tema => {
+            const card = document.createElement('div'); card.className = 'theme-card';
+            if (tema.nivel <= nivelLiberadoAluno) {
+                card.innerHTML = `<span>${tema.nome}</span>`;
+                card.onclick = () => renderizarMapaRamificacoes(tema);
+            } else {
+                card.classList.add('locked');
+                card.innerHTML = `<span class="icon">🔒</span><span>${tema.nome}</span><span style="font-size: 12px; margin-top: 8px;">Nível ${tema.nivel}</span>`;
+            }
+            grid.appendChild(card);
+        });
+    }
+
+    // Mapa de Ramificações (Árvore de Missões)
+    function renderizarMapaRamificacoes(temaObj) {
+        temaAtual = temaObj;
+        mudarTela('screen-map');
+        document.getElementById('map-title').innerText = `Mapa: ${temaObj.nome}`;
+        const mapContainer = document.getElementById('map-container');
+        mapContainer.innerHTML = "";
+
+        // Pega todas as questões do tema para saber quantas fases são possíveis
+        let questoesTema = bancoGeral.filter(q => q.tema === temaObj.id);
+        
+        // Organiza as questões pelo ID de forma determinística
+        questoesTema.sort((a, b) => a.id.localeCompare(b.id)); 
+        
+        let totalFases = Math.floor(questoesTema.length / temaObj.qtd_questoes);
+        let notasDoTema = historicoAluno[temaObj.id] || {};
+        
+        // Verifica se a Fase 1 principal foi aprovada (nota >= 6.0)
+        let fase1Aprovada = (notasDoTema["1"] >= 6.0);
+
+        for (let i = 1; i <= totalFases; i++) {
+            let notaFase = notasDoTema[String(i)];
+            let hasNota = (notaFase !== undefined);
+            
+            let isPrincipal = (i === 1);
+            let isBloqueado = !isPrincipal && !fase1Aprovada;
+            
+            // APLICAÇÃO DAS SUAS REGRAS DE BLOQUEIO:
+            let isConcluido = false;
+            if (isPrincipal) {
+                // A Missão Principal só trava se o aluno atingir a meta (6.0)
+                isConcluido = (hasNota && parseFloat(notaFase) >= 6.0); 
+            } else {
+                // Missões Extras travam na primeira tentativa, independentemente da nota
+                isConcluido = hasNota; 
+            }
+
+            let nodeClass = "map-node";
+            let statusText = isPrincipal ? "Missão Principal" : "Missão Extra";
+            let iconText = i;
+
+            if (isBloqueado) {
+                nodeClass += " locked";
+                statusText = "Conclua a principal para liberar";
+                iconText = "🔒";
+            } else if (isConcluido) {
+                nodeClass += " passed";
+                statusText = `Concluída - Nota: ${parseFloat(notaFase).toFixed(1)}`;
+                iconText = "✅";
+            } else if (hasNota) {
+                // Se tem nota mas não está concluído, é porque é a Principal com nota baixa
+                statusText = `Refazer Missão (Nota Anterior: ${parseFloat(notaFase).toFixed(1)})`;
+            }
+
+            const node = document.createElement('div');
+            node.className = nodeClass;
+            node.innerHTML = `
+                <div class="node-icon">${iconText}</div>
+                <div class="node-info">
+                    <div class="node-title">Fase ${i} ${isPrincipal ? '🚀' : '⭐'}</div>
+                    <div class="node-status">${statusText}</div>
+                </div>
+            `;
+
+            // Só permite clicar se não estiver bloqueado E não estiver concluído
+            if (!isBloqueado && !isConcluido) {
+                node.onclick = () => iniciarFase(temaObj, i, questoesTema);
+            }
+            
+            mapContainer.appendChild(node);
+        }
+    }
+
+    function iniciarFase(temaObj, indiceFase, questoesOrdenadas) {
+        faseAtualIndex = indiceFase;
+        respostasAluno = {}; questaoAtualIndex = 0;
+
+        // Fatiamento exato para não repetir questões:
+        let startIndex = (indiceFase - 1) * temaObj.qtd_questoes;
+        let endIndex = startIndex + temaObj.qtd_questoes;
+        
+        let questoesDestaFase = questoesOrdenadas.slice(startIndex, endIndex);
+        
+        // Embaralha as questões apenas dentro do bloco isolado da fase
+        provaSorteada = embaralhar(questoesDestaFase);
+
+        document.getElementById('badge-tema').innerText = `${temaObj.nome} (Fase ${indiceFase})`;
+        
+        const grid = document.getElementById('grid-navegacao'); grid.innerHTML = "";
+        provaSorteada.forEach((q, idx) => {
+            const box = document.createElement('div'); box.className = 'box-questao'; box.innerText = idx + 1;
+            box.onclick = () => { questaoAtualIndex = idx; renderizarQuestao(); };
+            grid.appendChild(box);
+        });
+
+        renderizarQuestao(); mudarTela('screen-exam');
+    }
+
+    function renderizarQuestao() {
+        const q = provaSorteada[questaoAtualIndex];
+        document.getElementById('titulo-questao').innerText = `Questão ${questaoAtualIndex + 1}`;
+        document.getElementById('imagem-questao').src = q.url;
+        document.querySelectorAll('.option-btn').forEach(btn => {
+            btn.classList.remove('selected'); if (respostasAluno[q.id] === btn.innerText) btn.classList.add('selected');
+        });
+        document.querySelectorAll('.box-questao').forEach((box, i) => {
+            box.classList.remove('atual'); if (i === questaoAtualIndex) box.classList.add('atual');
+            if (respostasAluno[provaSorteada[i].id]) box.classList.add('respondida');
+        });
+    }
+
+    function selecionarAlternativa(letra) {
+        respostasAluno[provaSorteada[questaoAtualIndex].id] = letra;
+        renderizarQuestao();
+        setTimeout(() => { if(questaoAtualIndex < provaSorteada.length -1) { questaoAtualIndex++; renderizarQuestao(); } }, 300);
+    }
+    function navegar(dir) {
+        if(questaoAtualIndex + dir >= 0 && questaoAtualIndex + dir < provaSorteada.length) { questaoAtualIndex += dir; renderizarQuestao(); }
+    }
+
+    function finalizarSimulado() {
+        if (Object.keys(respostasAluno).length < provaSorteada.length) if (!confirm("Faltam questões. Finalizar?")) return;
+        mudarTela('screen-end');
+        let acertos = 0; let lista = [];
+        provaSorteada.forEach(q => {
+            const r = respostasAluno[q.id] || "N/A"; lista.push({id: q.id, resposta: r});
+            if (q.gabarito === r) acertos++;
+        });
+        let notaFinal = (acertos / provaSorteada.length) * 10;
+        
+        const payload = { acao: "salvar_prova", usuario: dadosAluno.usuario, nome: dadosAluno.nome, turma: dadosAluno.turma, temaId: temaAtual.id, fase: faseAtualIndex, nivelTemaAtual: temaAtual.nivel, nota: notaFinal, respostas: lista };
+        
+        fetch(URL_GOOGLE_SCRIPT, { method: 'POST', body: JSON.stringify(payload) }).then(r=>r.json()).then(d => {
+            document.getElementById('end-spinner').style.display = "none";
+            let msg = document.getElementById('msg-envio');
+            if (d.sucesso) {
+                msg.innerHTML = `✅ Nota: ${notaFinal.toFixed(1)}!`; msg.style.color = "green";
+                
+                if(!historicoAluno[temaAtual.id]) historicoAluno[temaAtual.id] = {};
+                
+                // Agora ele sempre sobrescreve a nota local com a tentativa mais recente
+                historicoAluno[temaAtual.id][faseAtualIndex] = notaFinal;
+                
+                if (faseAtualIndex === 1 && notaFinal >= 6 && nivelLiberadoAluno <= temaAtual.nivel) {
+                    nivelLiberadoAluno++;
+                }
+            } else msg.innerHTML = "Erro ao salvar.";
+            document.getElementById('btn-voltar-dash').style.display = "block";
+        });
+    }
+
+    // Minhas Conquistas (Com indentação corrigida e lista de fases)
+    function renderizarTrofeus() {
+        mudarTela('screen-trophies');
+        const grid = document.getElementById('trophies-grid'); grid.innerHTML = "";
+        
+        configuracaoTemas.forEach(tema => {
+            const card = document.createElement('div'); card.className = 'trophy-card';
+            let notas = historicoAluno[tema.id];
+            
+            let listaFasesHTML = "";
+            let notaFase1 = -1; // Variável isolada para a Fase 1
+
+            if (notas) {
+                // Captura a nota exclusivamente da Fase 1 para a medalha de destaque
+                if (notas["1"] !== undefined) notaFase1 = parseFloat(notas["1"]);
+
+                for (let fase in notas) {
+                    let n = parseFloat(notas[fase]);
+                    // Fonte preta mantida através da cor padrão (--text) no CSS
+                    listaFasesHTML += `<div class="fase-badge"><span>Fase ${fase}</span> <span>${n.toFixed(1)}</span></div>`;
+                }
+            }
+
+            let htmlMedalhaTopo = `<div class="trophy-badge" style="background:#e5e7eb; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:35px;">🔒</div>`;
+            
+            // A medalha de destaque agora avalia apenas a notaFase1
+            if (notaFase1 >= 0) {
+                let catFase1 = categoriasMedalhas.find(c => notaFase1 >= c.min);
+                if (catFase1) {
+                    htmlMedalhaTopo = `<img src="${catFase1.img}" class="trophy-badge" alt="${catFase1.nome}">`;
+                }
+            } else {
+                listaFasesHTML = `<div style="color:#9ca3af; font-size: 14px; margin-top: 10px;">Nenhuma fase concluída</div>`;
+            }
+
+            card.innerHTML = `
+                ${htmlMedalhaTopo}
+                <span style="font-weight:bold; font-size: 18px; margin-bottom: 20px;">${tema.nome}</span>
+                <div class="fase-badge-list">${listaFasesHTML}</div>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    function carregarRanking(turmaDesejada = null) {
+        mudarTela('screen-loading');
+        
+        // Se nenhuma turma for passada, usa a turma do aluno como padrão
+        let turmaAlvo = turmaDesejada || dadosAluno.turma;
+        
+        // Atualiza o menu de filtro para refletir a escolha atual
+        const selectFiltro = document.getElementById('filtro-ranking');
+        if (selectFiltro) selectFiltro.value = turmaAlvo;
+
+        fetch(`${URL_GOOGLE_SCRIPT}?acao=ranking&turma=${encodeURIComponent(turmaAlvo)}`).then(r=>r.json()).then(data => {
+            const lista = document.getElementById('ranking-list'); lista.innerHTML = "";
+            if (data.sucesso && data.dados.length > 0) {
+                data.dados.forEach(aluno => {
+                    let contagem = { "Diamante":0, "Ouro":0, "Prata":0, "Cobre":0, "Ferro":0 };
+                    for (let tema in aluno.notas) {
+                        for (let fase in aluno.notas[tema]) {
+                            let cat = categoriasMedalhas.find(c => parseFloat(aluno.notas[tema][fase]) >= c.min);
+                            if (cat) contagem[cat.nome]++;
+                        }
+                    }
+                    let htmlMedalhas = "";
+                    categoriasMedalhas.forEach(cat => {
+                        if (contagem[cat.nome] > 0) htmlMedalhas += `<div class="medal-item"><img src="${cat.img}" class="medal-icon-img"><span class="medal-count">${contagem[cat.nome]}</span></div>`;
+                    });
+                    
+                    // Se estiver olhando o ranking de "Todas", exibe o nome da turma abaixo do nome do aluno
+                    let badgeTurma = turmaAlvo === "Todas" ? `<span style="display:block; font-size: 11px; color: #6b7280; font-weight: normal; margin-top: 3px;">${aluno.turma}</span>` : "";
+
+                    lista.innerHTML += `<div class="ranking-row"><div class="ranking-name">${aluno.nome.split(" ")[0]} ${badgeTurma}</div><div class="ranking-medals">${htmlMedalhas}</div><div class="ranking-score">${aluno.pontos.toFixed(1)}</div></div>`;
+                });
+            } else { lista.innerHTML = "<p style='text-align:center;'>Nenhum aluno pontuou nesta turma ainda.</p>"; }
+            mudarTela('screen-ranking');
+        });
+    }
+
+    // Painel Admin
+    function carregarPainelProfessor() {
+        mudarTela('screen-loading');
+        fetch(`${URL_GOOGLE_SCRIPT}?acao=painel_professor`).then(r=>r.json()).then(data => {
+            document.getElementById('kpi-alunos').innerText = data.totalAlunos;
+            document.getElementById('kpi-provas').innerText = data.provasRealizadas;
+            document.getElementById('kpi-media').innerText = data.mediaGeral;
+            
+            const grid = document.getElementById('kpi-descritores'); grid.innerHTML = "";
+            data.descritores.forEach(desc => {
+                grid.innerHTML += `<div class="kpi-card"><div class="kpi-label">${desc.tema}</div><div class="kpi-value">${desc.media}</div></div>`;
+            });
+            const tab = document.getElementById('kpi-tabela-atividades'); tab.innerHTML = "";
+            data.atividades.forEach(a => { tab.innerHTML += `<tr><td>${a.data}</td><td>${a.nome}</td><td>${a.turma}</td><td>${a.tema}</td><td>${a.nota.toFixed(1)}</td></tr>`; });
+            mudarTela('screen-admin');
+        });
+    }
+
+    function mudarTela(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+</script>
+</body>
+</html>
