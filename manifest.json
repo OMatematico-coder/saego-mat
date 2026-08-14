@@ -1,15 +1,23 @@
 {
   "name": "Simulado - Jornada de Aprendizado",
   "short_name": "Simulado",
+  "description": "Plataforma gamificada e interativa para simulados e resolução de missões matemáticas.",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#f3f4f6",
   "theme_color": "#2563eb",
   "icons": [
     {
-      "src": "icones/diamante.png",
+      "src": "./icones/app_icon.png",
       "sizes": "256x256",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icones/app_icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
