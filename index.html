@@ -43,10 +43,37 @@
         .dash-card span { position: relative; z-index: 2; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
         .dash-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.2); }
 
+        /* Cards de Temas (Texto no topo e imagem livre) */
         .themes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 20px; }
-        .theme-card { padding: 25px 15px; background: var(--primary); color: white; border-radius: 8px; text-align: center; cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 140px;}
-        .theme-card:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(37, 99, 235, 0.3); }
-        .theme-card.locked { background: var(--locked); color: #6b7280; cursor: not-allowed; transform: none; box-shadow: none; }
+        
+        .theme-card {
+            background-color: white; background-position: center bottom;
+            border-radius: 8px; text-align: center; cursor: pointer; transition: 0.2s; 
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+            height: 280px; position: relative; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+            border: 1px solid #e5e7eb; padding: 0; /* Padding zerado para a barra colar nas bordas */
+        }
+        .theme-card:hover { transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.15); }
+        
+        /* Nova Barra Branca no Topo */
+        .theme-title-bar {
+            background: white; color: var(--text); width: 100%; padding: 12px 10px;
+            font-weight: bold; font-size: 15px; border-bottom: 1px solid #e5e7eb;
+            z-index: 2; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        /* Película esbranquiçada apenas para embaçar as imagens bloqueadas */
+        .theme-card.locked::before { content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.7); z-index: 1; }
+        .theme-card.locked { cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* Estilos do Relatório de Correção */
+        .correction-container { margin-top: 25px; text-align: left; background: white; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb; max-height: 320px; overflow-y: auto; display: none; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
+        .correction-item { padding: 12px 10px; border-bottom: 1px solid #e5e7eb; display: flex; flex-direction: column; gap: 4px; font-size: 15px; }
+        .correction-item:last-child { border-bottom: none; }
+        .corr-row { display: flex; justify-content: space-between; align-items: center; }
+        .status-correct { color: #10b981; font-weight: bold; }
+        .status-wrong { color: #ef4444; font-weight: bold; }
+        .corr-gabarito { font-size: 13px; color: #6b7280; font-weight: bold; text-align: right; }
 
         /* Arvore de Missões (Map) */
         .map-container { display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 30px 0; position: relative; }
@@ -76,6 +103,20 @@
         .medal-icon-img { width: 45px; height: 45px; object-fit: contain; } /* <-- Medalhas Maiores aqui */
         .medal-count { font-size: 13px; color: #6b7280; margin-top: 4px; font-weight: bold; }
         .ranking-score { font-size: 24px; font-weight: bold; color: var(--text); width: 80px; text-align: right; }
+
+	/* Modal de Revisão de Questão */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
+        .modal-content { background: white; border-radius: 8px; width: 100%; max-width: 700px; max-height: 95vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .modal-header { padding: 15px 20px; background: var(--primary); color: white; display: flex; justify-content: space-between; align-items: center; font-size: 18px; font-weight: bold; }
+        .modal-body { padding: 20px; overflow-y: auto; text-align: center; background: #f9fafb; }
+        .modal-body img { max-width: 100%; max-height: 50vh; object-fit: contain; margin-bottom: 20px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .modal-footer { padding: 15px 20px; border-top: 1px solid #e5e7eb; text-align: right; background: white; }
+        .btn-close { background: #6b7280; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .btn-close:hover { background: #4b5563; }
+        
+        /* Efeito interativo nas questões erradas */
+        .corr-item-clickable { cursor: pointer; transition: 0.2s; border: 1px solid transparent; }
+        .corr-item-clickable:hover { background-color: #fef2f2; border-color: #fca5a5; transform: scale(1.01); }
 
         /* Simulado e KPIs admin (Mantidos intactos) */
         .exam-layout { display: flex; flex: 1; flex-direction: row; gap: 20px; }
@@ -165,13 +206,13 @@
         
         <div class="dash-cards-grid">
             <!-- Insira os links locais das suas imagens na propriedade url() -->
-            <div class="dash-card" style="background-image: url('capa_missoes.jpg');" onclick="renderizarGradeDeTemas()">
+            <div class="dash-card" style="background-image: url('capas/capa_missoes.png');" onclick="renderizarGradeDeTemas()">
                 <span>🚀 Explorar Missões</span>
             </div>
-            <div class="dash-card" style="background-image: url('capa_conquistas.jpg');" onclick="renderizarTrofeus()">
+            <div class="dash-card" style="background-image: url('capas/capa_galeria.png');" onclick="renderizarTrofeus()">
                 <span>🏆 Minhas Conquistas</span>
             </div>
-            <div class="dash-card" style="background-image: url('capa_ranking.jpg');" onclick="carregarRanking()">
+            <div class="dash-card" style="background-image: url('capas/capa_ranking.png');" onclick="carregarRanking()">
                 <span>📊 Ranking da Turma</span>
             </div>
         </div>
@@ -248,12 +289,44 @@
     </div>
 
     <!-- Tela 5: Conclusão -->
+    <!-- Tela 5: Conclusão -->
     <div id="screen-end" class="screen">
         <div class="header-text">
-            <h2>Missão Concluída!</h2>
-            <p id="msg-envio" style="margin-top: 15px; font-size: 18px;">Enviando relatório...</p>
+            <h2 id="end-title">Processando Missão...</h2>
             <div class="spinner" id="end-spinner"></div>
+            <p id="msg-envio" style="margin-top: 10px; font-size: 26px; font-weight: bold;"></p>
+            
+            <!-- Painel de Relatório (Invisível por padrão) -->
+            <div id="container-correcao" class="correction-container">
+                <h3 style="margin-bottom: 15px; text-align: center; color: var(--text); border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">Relatório de Desempenho</h3>
+                <div id="lista-correcao"></div>
+            </div>
+
             <button class="btn-primary" id="btn-voltar-dash" style="display:none; margin-top: 30px;" onclick="mudarTela('screen-dashboard')">Voltar ao Menu Principal</button>
+        </div>
+    </div>
+
+    <!-- Modal Flutuante de Revisão -->
+    <div class="modal-overlay" id="modal-revisao">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>🔍 Revisão de Questão</span>
+                <button onclick="fecharRevisao()" style="background:none; border:none; color:white; font-size:24px; cursor:pointer; line-height: 1;">&times;</button>
+            </div>
+            <div class="modal-body">
+                <img id="rev-imagem" src="" alt="Imagem da Questão">
+                <div style="display: flex; justify-content: center; gap: 20px; margin-top: 15px; flex-wrap: wrap;">
+                    <div style="padding: 12px 25px; background: #fee2e2; border: 1px solid #fca5a5; border-radius: 8px; color: #ef4444; font-weight: bold; font-size: 16px;">
+                        Você marcou: <span id="rev-sua-resp"></span>
+                    </div>
+                    <div style="padding: 12px 25px; background: #d1fae5; border: 1px solid #6ee7b7; border-radius: 8px; color: #10b981; font-weight: bold; font-size: 16px;">
+                        Gabarito correto: <span id="rev-gabarito"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-close" onclick="fecharRevisao()">Fechar Revisão</button>
+            </div>
         </div>
     </div>
 
@@ -287,31 +360,31 @@
     const URL_GOOGLE_SCRIPT = "https://script.google.com/macros/s/AKfycbwt1lmARd7SeHFhb7jOmrhPwxbffIIadggWe5P3i-r1cedBvvDNbuWHOiMw2e8o5A8tuQ/exec";
 
     const configuracaoTemas = [
-        { nivel: 1, id: "D36", nome: "Resolver problema com informações em gráficos ou tabelas", qtd_questoes: 8 },
+        { nivel: 1, id: "D36", nome: "Resolver problema com informações em gráficos ou tabelas", qtd_questoes: 8, capa: "capas/capa_d36.png" },
 
-        { nivel: 2, id: "D28", nome: "Resolver problema com porcentagem", qtd_questoes: 8 },
+        { nivel: 2, id: "D28", nome: "Resolver problema com porcentagem", qtd_questoes: 8, capa: "capas/capa_d28.png" },
 
-        { nivel: 3, id: "D26", nome: "Resolver problema com números racionais", qtd_questoes: 8 },
+        { nivel: 3, id: "D26", nome: "Resolver problema com números racionais", qtd_questoes: 8, capa: "capas/capa_d26.png" },
 
-	{ nivel: 4, id: "D13", nome: "Resolver problema envolvendo área", qtd_questoes: 8 },
+	{ nivel: 4, id: "D13", nome: "Resolver problema envolvendo área", qtd_questoes: 8, capa: "capas/capa_d13.png" },
 
-	{ nivel: 16, id: "D16", nome: "Identificar a localização de números inteiros na reta numérica", qtd_questoes: 7 },
+	{ nivel: 16, id: "D16", nome: "Identificar a localização de números inteiros na reta numérica", qtd_questoes: 7, capa: "capas/capa_d16.png" },
 
-        { nivel: 17, id: "D34", nome: "Identificar um sistema de equações do 1º grau", qtd_questoes: 6 },
+        { nivel: 17, id: "D34", nome: "Identificar um sistema de equações do 1º grau", qtd_questoes: 6, capa: "capas/capa_d34.png" },
 
-        { nivel: 18, id: "D08", nome: "Efetuar cálculos com números inteiros", qtd_questoes: 5 },
+        { nivel: 18, id: "D08", nome: "Resolver problema utilizando propriedades dos polígonos", qtd_questoes: 5, capa: "capas/capa_d08.png" },
 
-	{ nivel: 19, id: "D22", nome: "Identificar fração como representação associada a diferentes significados.", qtd_questoes: 6 },
+	{ nivel: 19, id: "D22", nome: "Identificar fração como representação associada a diferentes significados.", qtd_questoes: 6, capa: "capas/capa_d22.png" },
 
-        { nivel: 20, id: "D02", nome: "Identificar e relacionar planificações", qtd_questoes: 6 },
+        { nivel: 20, id: "D02", nome: "Identificar e relacionar planificações", qtd_questoes: 6, capa: "capas/capa_d02.png" },
 
-        { nivel: 21, id: "D03", nome: "Identificar propriedades de triângulos", qtd_questoes: 5 },
+        { nivel: 21, id: "D03", nome: "Identificar propriedades de triângulos", qtd_questoes: 5, capa: "capas/capa_d03.png" },
 
-	{ nivel: 22, id: "D33", nome: "Identificar uma equação ou inequação do 1º grau", qtd_questoes: 6 },
+	{ nivel: 22, id: "D33", nome: "Identificar uma equação ou inequação do 1º grau", qtd_questoes: 6, capa: "capas/capa_d33.png" },
 
-        { nivel: 24, id: "D18", nome: "Efetuar cálculos com números inteiros", qtd_questoes: 5 },
+        { nivel: 24, id: "D18", nome: "Efetuar cálculos com números inteiros", qtd_questoes: 5, capa: "capas/capa_d18.png" },
 
-	{ nivel: 25, id: "D23", nome: "Identificar frações equivalentes", qtd_questoes: 4 }
+	{ nivel: 25, id: "D23", nome: "Identificar frações equivalentes", qtd_questoes: 4, capa: "capas/capa_d23.png" }
 
     ];
 
@@ -631,14 +704,32 @@
     function renderizarGradeDeTemas() {
         mudarTela('screen-themes');
         const grid = document.getElementById('themes-grid'); grid.innerHTML = "";
+        
         configuracaoTemas.forEach(tema => {
-            const card = document.createElement('div'); card.className = 'theme-card';
+            const card = document.createElement('div'); 
+            card.className = 'theme-card';
+            
+            // Aplica a imagem de capa garantindo que ela não seja cortada
+            if (tema.capa) {
+                card.style.backgroundImage = `url('${tema.capa}')`;
+                card.style.backgroundSize = "contain"; 
+                card.style.backgroundRepeat = "no-repeat";
+            }
+
             if (tema.nivel <= nivelLiberadoAluno) {
-                card.innerHTML = `<span>${tema.nome}</span>`;
+                // Tema Liberado: Apenas a barra branca no topo
+                card.innerHTML = `<div class="theme-title-bar">${tema.nome}</div>`;
                 card.onclick = () => renderizarMapaRamificacoes(tema);
             } else {
+                // Tema Bloqueado: Barra branca no topo + Ícone de cadeado centralizado
                 card.classList.add('locked');
-                card.innerHTML = `<span class="icon">🔒</span><span>${tema.nome}</span><span style="font-size: 12px; margin-top: 8px;">Nível ${tema.nivel}</span>`;
+                card.innerHTML = `
+                    <div class="theme-title-bar">${tema.nome}</div>
+                    <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2;">
+                        <span style="font-size: 30px; margin-bottom: 5px;">🔒</span>
+                        <span style="font-size: 13px; font-weight: bold; background: white; padding: 4px 10px; border-radius: 20px; color: #4b5563; border: 1px solid #e5e7eb;">Nível ${tema.nivel}</span>
+                    </div>
+                `;
             }
             grid.appendChild(card);
         });
@@ -765,34 +856,97 @@
     }
 
     function finalizarSimulado() {
-        if (Object.keys(respostasAluno).length < provaSorteada.length) if (!confirm("Faltam questões. Finalizar?")) return;
-        mudarTela('screen-end');
-        let acertos = 0; let lista = [];
-        provaSorteada.forEach(q => {
-            const r = respostasAluno[q.id] || "N/A"; lista.push({id: q.id, resposta: r});
-            if (q.gabarito === r) acertos++;
-        });
-        let notaFinal = (acertos / provaSorteada.length) * 10;
+        if (Object.keys(respostasAluno).length < provaSorteada.length) if (!confirm("Faltam questões. Finalizar mesmo assim?")) return;
         
+        // Ativa a tela de Processamento antes de saber o resultado
+        document.getElementById('end-title').innerText = "Processando Missão...";
+        document.getElementById('end-spinner').style.display = "block";
+        document.getElementById('msg-envio').innerText = "";
+        document.getElementById('container-correcao').style.display = "none";
+        document.getElementById('btn-voltar-dash').style.display = "none";
+        mudarTela('screen-end');
+
+        let acertos = 0; let lista = [];
+        let htmlCorrecao = "";
+
+        // Calcula a nota localmente e já monta o relatório de correção
+        // Calcula a nota localmente e já monta o relatório de correção
+        provaSorteada.forEach((q, idx) => {
+            const r = respostasAluno[q.id] || "Vazio"; 
+            lista.push({id: q.id, resposta: r});
+            
+            let numQuestao = idx + 1;
+            if (q.gabarito === r) {
+                acertos++;
+                htmlCorrecao += `<div class="correction-item"><div class="corr-row"><span>Questão ${numQuestao}</span><span class="status-correct">Resposta: ${r} ✅</span></div></div>`;
+            } else {
+                // Questão errada agora é clicável e chama a função de revisão
+                htmlCorrecao += `
+                <div class="correction-item corr-item-clickable" onclick="abrirRevisao('${q.id}', '${r}', '${q.gabarito}')" title="Clique para revisar esta questão">
+                    <div class="corr-row">
+                        <span style="color: var(--primary); font-weight: bold;">Questão ${numQuestao} 🔍</span>
+                        <span class="status-wrong">Resposta: ${r} ❌</span>
+                    </div>
+                    <div class="corr-gabarito">Gabarito correto: ${q.gabarito}</div>
+                    <div style="font-size: 12px; color: #6b7280; margin-top: 6px; text-align: left;">👆 Clique aqui para ver a imagem da questão</div>
+                </div>`;
+            }
+        });
+
+        let notaFinal = (acertos / provaSorteada.length) * 10;
         const payload = { acao: "salvar_prova", usuario: dadosAluno.usuario, nome: dadosAluno.nome, turma: dadosAluno.turma, temaId: temaAtual.id, fase: faseAtualIndex, nivelTemaAtual: temaAtual.nivel, nota: notaFinal, respostas: lista };
         
-        fetch(URL_GOOGLE_SCRIPT, { method: 'POST', body: JSON.stringify(payload) }).then(r=>r.json()).then(d => {
+        fetch(URL_GOOGLE_SCRIPT, { method: 'POST', body: JSON.stringify(payload) })
+        .then(r=>r.json()).then(d => {
+            // Remove o spinner e apresenta os resultados definitivos
+            document.getElementById('end-title').innerText = "Missão Concluída!";
             document.getElementById('end-spinner').style.display = "none";
             let msg = document.getElementById('msg-envio');
+
             if (d.sucesso) {
-                msg.innerHTML = `✅ Nota: ${notaFinal.toFixed(1)}!`; msg.style.color = "green";
-                
+                msg.innerHTML = `Sua Nota: ${notaFinal.toFixed(1)}`; 
+                msg.style.color = notaFinal >= 6 ? "#10b981" : "#ef4444";
+
+                // REGRAS DE EXIBIÇÃO: Mostra se (Fase 1 e passou) OU (Fase Extra)
+                if ((faseAtualIndex === 1 && notaFinal >= 6) || faseAtualIndex > 1) {
+                    document.getElementById('lista-correcao').innerHTML = htmlCorrecao;
+                    document.getElementById('container-correcao').style.display = "block";
+                }
+
                 if(!historicoAluno[temaAtual.id]) historicoAluno[temaAtual.id] = {};
-                
-                // Agora ele sempre sobrescreve a nota local com a tentativa mais recente
                 historicoAluno[temaAtual.id][faseAtualIndex] = notaFinal;
                 
                 if (faseAtualIndex === 1 && notaFinal >= 6 && nivelLiberadoAluno <= temaAtual.nivel) {
                     nivelLiberadoAluno++;
                 }
-            } else msg.innerHTML = "Erro ao salvar.";
+            } else {
+                msg.innerHTML = "Erro ao salvar pontuação."; msg.style.color = "#ef4444";
+            }
+            document.getElementById('btn-voltar-dash').style.display = "block";
+        }).catch(err => {
+            document.getElementById('end-title').innerText = "Erro de Conexão";
+            document.getElementById('end-spinner').style.display = "none";
+            document.getElementById('msg-envio').innerHTML = "Verifique sua internet.";
             document.getElementById('btn-voltar-dash').style.display = "block";
         });
+    }
+
+    function abrirRevisao(idQuestao, respAluno, gabarito) {
+        // Encontra a questão exata no array que foi sorteado
+        const questao = provaSorteada.find(q => q.id === idQuestao);
+        
+        if(questao) {
+            document.getElementById('rev-imagem').src = questao.url;
+            document.getElementById('rev-sua-resp').innerText = respAluno;
+            document.getElementById('rev-gabarito').innerText = gabarito;
+            
+            // Exibe a janela flutuante
+            document.getElementById('modal-revisao').style.display = 'flex';
+        }
+    }
+
+    function fecharRevisao() {
+        document.getElementById('modal-revisao').style.display = 'none';
     }
 
     // Minhas Conquistas (Com indentação corrigida e lista de fases)
