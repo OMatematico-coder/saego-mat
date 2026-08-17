@@ -184,6 +184,7 @@
                 <option value="" disabled selected>Selecione a turma...</option>
                 <option value="9º Ano - A">9º Ano - A</option>
                 <option value="9º Ano - B">9º Ano - B</option>
+		<option value="9º Ano - C">9º Ano - C</option>
             </select>
         </div>
         <div class="input-group"><label>Criar Usuário:</label><input type="text" id="cad-usuario" required></div>
@@ -251,6 +252,7 @@
                 <select id="filtro-ranking" onchange="carregarRanking(this.value)" style="padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 16px; font-weight: bold; color: var(--text); background: white; cursor: pointer; max-width: 300px;">
                     <option value="9º Ano - A">9º Ano - A</option>
                     <option value="9º Ano - B">9º Ano - B</option>
+		    <option value="9º Ano - C">9º Ano - C</option>
                     <option value="Todas">🏆 Todas as Turmas</option>
                 </select>
             </div>
@@ -278,7 +280,7 @@
                     <button class="option-btn" onclick="selecionarAlternativa('B')">B</button>
                     <button class="option-btn" onclick="selecionarAlternativa('C')">C</button>
                     <button class="option-btn" onclick="selecionarAlternativa('D')">D</button>
-                    <button class="option-btn" onclick="selecionarAlternativa('E')">E</button>
+                    // <button class="option-btn" onclick="selecionarAlternativa('E')">E</button>
                 </div>
                 <div class="nav-buttons">
                     <button class="btn-prev" onclick="navegar(-1)">Anterior</button>
@@ -368,6 +370,28 @@
 
 	{ nivel: 4, id: "D13", nome: "Resolver problema envolvendo área", qtd_questoes: 8, capa: "capas/capa_d13.png" },
 
+	{ nivel: 5, id: "D19", nome: "Resolver problema com números naturais", qtd_questoes: 8, capa: "capas/capa_d19.png" },
+
+        { nivel: 6, id: "D14", nome: "Resolver problema envolvendo volume", qtd_questoes: 7, capa: "capas/capa_d14.png" },
+
+	{ nivel: 7, id: "D17", nome: "Identificar a localização de números racionais na reta numérica", qtd_questoes: 7, capa: "capas/capa_d17.png" },
+
+        { nivel: 8, id: "D29", nome: "Resolver problema que envolva variação proporcional entre grandezas", qtd_questoes: 7, capa: "capas/capa_d29.png" },
+
+        { nivel: 9, id: "D15", nome: "Resolver problema utilizando relações entre diferentes unidades de medida", qtd_questoes: 7, capa: "capas/capa_d15.png" },
+
+	{ nivel: 10, id: "D30", nome: "Calcular o valor numérico de uma expressão algébrica", qtd_questoes: 6, capa: "capas/capa_d30.png" },
+
+	{ nivel: 11, id: "D20", nome: "Resolver problema com números inteiros", qtd_questoes: 5, capa: "capas/capa_d20.png" },
+
+	{ nivel: 12, id: "D21", nome: "Reconhecer as representações dos racionais", qtd_questoes: 7, capa: "capas/capa_d21.png" },
+
+	{ nivel: 13, id: "D12", nome: "Resolver problema com perímetro", qtd_questoes: 7, capa: "capas/capa_d12.png" },
+
+	{ nivel: 14, id: "D32", nome: "Identificar a expressão algébrica que expressa sequência de números ou figuras", qtd_questoes: 7, capa: "capas/capa_d32.png" },
+
+	{ nivel: 15, id: "D09", nome: "Interpretar informações apresentadas por coordenadas cartesianas.", qtd_questoes: 7, capa: "capas/capa_d09.png" },
+
 	{ nivel: 16, id: "D16", nome: "Identificar a localização de números inteiros na reta numérica", qtd_questoes: 7, capa: "capas/capa_d16.png" },
 
         { nivel: 17, id: "D34", nome: "Identificar um sistema de equações do 1º grau", qtd_questoes: 6, capa: "capas/capa_d34.png" },
@@ -381,6 +405,8 @@
         { nivel: 21, id: "D03", nome: "Identificar propriedades de triângulos", qtd_questoes: 5, capa: "capas/capa_d03.png" },
 
 	{ nivel: 22, id: "D33", nome: "Identificar uma equação ou inequação do 1º grau", qtd_questoes: 6, capa: "capas/capa_d33.png" },
+
+	{ nivel: 23, id: "D04", nome: "Identificar relação entre quadriláteros e suas propriedades.", qtd_questoes: 4, capa: "capas/capa_d04.png" },
 
         { nivel: 24, id: "D18", nome: "Efetuar cálculos com números inteiros", qtd_questoes: 5, capa: "capas/capa_d18.png" },
 
@@ -524,6 +550,231 @@
 { id: "M00131696", tema: "D13", url: "imagens/D13/M00131696.png", gabarito: "B" },
 
 
+{ id: "M00143521", tema: "D12", url: "imagens/D12/M00143521.png", gabarito: "B" },
+{ id: "M090099H6", tema: "D12", url: "imagens/D12/M090099H6.png", gabarito: "B" },
+{ id: "M00179150", tema: "D12", url: "imagens/D12/M00179150.png", gabarito: "D" },
+{ id: "M060131H6", tema: "D12", url: "imagens/D12/M060131H6.png", gabarito: "C" },
+{ id: "M070254E4", tema: "D12", url: "imagens/D12/M070254E4.png", gabarito: "B" },
+{ id: "M08007017", tema: "D12", url: "imagens/D12/M08007017.png", gabarito: "B" },
+{ id: "M090073H6", tema: "D12", url: "imagens/D12/M090073H6.png", gabarito: "C" },
+{ id: "M090184G5", tema: "D12", url: "imagens/D12/M090184G5.png", gabarito: "B" },
+{ id: "MEF0088PC", tema: "D12", url: "imagens/D12/MEF0088PC.png", gabarito: "A" },
+{ id: "M00034940", tema: "D12", url: "imagens/D12/M00034940.png", gabarito: "B" },
+{ id: "M00038184", tema: "D12", url: "imagens/D12/M00038184.png", gabarito: "D" },
+{ id: "M00076283", tema: "D12", url: "imagens/D12/M00076283.png", gabarito: "D" },
+{ id: "M00132592", tema: "D12", url: "imagens/D12/M00132592.png", gabarito: "B" },
+{ id: "M00143468", tema: "D12", url: "imagens/D12/M00143468.png", gabarito: "B" },
+
+
+{ id: "M051284H6", tema: "D19", url: "imagens/D19/M051284H6.png", gabarito: "B" },
+{ id: "M00074579", tema: "D19", url: "imagens/D19/M00074579.png", gabarito: "A" },
+{ id: "M00102330", tema: "D19", url: "imagens/D19/M00102330.png", gabarito: "A" },
+{ id: "M00102341", tema: "D19", url: "imagens/D19/M00102341.png", gabarito: "A" },
+{ id: "M00102354", tema: "D19", url: "imagens/D19/M00102354.png", gabarito: "A" },
+{ id: "M00102364", tema: "D19", url: "imagens/D19/M00102364.png", gabarito: "A" },
+{ id: "M00143476", tema: "D19", url: "imagens/D19/M00143476.png", gabarito: "A" },
+{ id: "M00143503", tema: "D19", url: "imagens/D19/M00143503.png", gabarito: "A" },
+{ id: "M00179082", tema: "D19", url: "imagens/D19/M00179082.png", gabarito: "A" },
+{ id: "M00184112", tema: "D19", url: "imagens/D19/M00184112.png", gabarito: "A" },
+{ id: "M008335", tema: "D19", url: "imagens/D19/M008335.png", gabarito: "D" },
+{ id: "M018128", tema: "D19", url: "imagens/D19/M018128.png", gabarito: "D" },
+{ id: "M023672", tema: "D19", url: "imagens/D19/M023672.png", gabarito: "B" },
+{ id: "M03000481", tema: "D19", url: "imagens/D19/M03000481.png", gabarito: "A" },
+{ id: "M041363E4", tema: "D19", url: "imagens/D19/M041363E4.png", gabarito: "D" },
+{ id: "M051217H6", tema: "D19", url: "imagens/D19/M051217H6.png", gabarito: "C" },
+{ id: "M051354H6", tema: "D19", url: "imagens/D19/M051354H6.png", gabarito: "A" },
+{ id: "M051356H6", tema: "D19", url: "imagens/D19/M051356H6.png", gabarito: "D" },
+{ id: "M05140617", tema: "D19", url: "imagens/D19/M05140617.png", gabarito: "B" },
+{ id: "M05148917", tema: "D19", url: "imagens/D19/M05148917.png", gabarito: "A" },
+{ id: "M05152517", tema: "D19", url: "imagens/D19/M05152517.png", gabarito: "A" },
+{ id: "M060063H6", tema: "D19", url: "imagens/D19/M060063H6.png", gabarito: "B" },
+{ id: "M070453E4", tema: "D19", url: "imagens/D19/M070453E4.png", gabarito: "C" },
+{ id: "M070645H6", tema: "D19", url: "imagens/D19/M070645H6.png", gabarito: "D" },
+{ id: "M080707H6", tema: "D19", url: "imagens/D19/M080707H6.png", gabarito: "C" },
+
+
+{ id: "M00068786", tema: "D14", url: "imagens/D14/M00068786.png", gabarito: "D" },
+{ id: "M00126063", tema: "D14", url: "imagens/D14/M00126063.png", gabarito: "D" },
+{ id: "M06065217", tema: "D14", url: "imagens/D14/M06065217.png", gabarito: "D" },
+{ id: "M091942H6", tema: "D14", url: "imagens/D14/M091942H6.png", gabarito: "B" },
+{ id: "M07009617", tema: "D14", url: "imagens/D14/M07009617.png", gabarito: "D" },
+{ id: "M070526E4", tema: "D14", url: "imagens/D14/M070526E4.png", gabarito: "D" },
+{ id: "M07481317", tema: "D14", url: "imagens/D14/M07481317.png", gabarito: "D" },
+{ id: "M080867H6", tema: "D14", url: "imagens/D14/M080867H6.png", gabarito: "D" },
+{ id: "M090102H6", tema: "D14", url: "imagens/D14/M090102H6.png", gabarito: "D" },
+{ id: "M090187G5", tema: "D14", url: "imagens/D14/M090187G5.png", gabarito: "C" },
+{ id: "M090636H6", tema: "D14", url: "imagens/D14/M090636H6.png", gabarito: "B" },
+{ id: "M09146317", tema: "D14", url: "imagens/D14/M09146317.png", gabarito: "A" },
+{ id: "M091545H6", tema: "D14", url: "imagens/D14/M091545H6.png", gabarito: "C" },
+{ id: "M091561H6", tema: "D14", url: "imagens/D14/M091561H6.png", gabarito: "D" },
+{ id: "M00034398", tema: "D14", url: "imagens/D14/M00034398.png", gabarito: "D" },
+{ id: "M00034560", tema: "D14", url: "imagens/D14/M00034560.png", gabarito: "C" },
+{ id: "M00098453", tema: "D14", url: "imagens/D14/M00098453.png", gabarito: "D" },
+{ id: "M00102360", tema: "D14", url: "imagens/D14/M00102360.png", gabarito: "A" },
+{ id: "M00179156", tema: "D14", url: "imagens/D14/M00179156.png", gabarito: "C" },
+{ id: "M015493", tema: "D14", url: "imagens/D14/M015493.png", gabarito: "D" },
+{ id: "M030358", tema: "D14", url: "imagens/D14/M030358.png", gabarito: "C" },
+
+
+{ id: "M00115103", tema: "D17", url: "imagens/D17/M00115103.png", gabarito: "D" },
+{ id: "M09006717", tema: "D17", url: "imagens/D17/M09006717.png", gabarito: "B" },
+{ id: "M06087417", tema: "D17", url: "imagens/D17/M06087417.png", gabarito: "C" },
+{ id: "M00131707", tema: "D17", url: "imagens/D17/M00131707.png", gabarito: "C" },
+{ id: "M00179141", tema: "D17", url: "imagens/D17/M00179141.png", gabarito: "B" },
+{ id: "M00179159", tema: "D17", url: "imagens/D17/M00179159.png", gabarito: "B" },
+{ id: "M013329", tema: "D17", url: "imagens/D17/M013329.png", gabarito: "D" },
+{ id: "M013369", tema: "D17", url: "imagens/D17/M013369.png", gabarito: "B" },
+{ id: "M018529", tema: "D17", url: "imagens/D17/M018529.png", gabarito: "B" },
+{ id: "M018542", tema: "D17", url: "imagens/D17/M018542.png", gabarito: "B" },
+{ id: "M018545", tema: "D17", url: "imagens/D17/M018545.png", gabarito: "C" },
+{ id: "M019336", tema: "D17", url: "imagens/D17/M019336.png", gabarito: "A" },
+{ id: "M051105H6", tema: "D17", url: "imagens/D17/M051105H6.png", gabarito: "B" },
+{ id: "M060026B1", tema: "D17", url: "imagens/D17/M060026B1.png", gabarito: "B" },
+{ id: "M070643H6", tema: "D17", url: "imagens/D17/M070643H6.png", gabarito: "B" },
+{ id: "M07474917", tema: "D17", url: "imagens/D17/M07474917.png", gabarito: "C" },
+{ id: "M080259B1", tema: "D17", url: "imagens/D17/M080259B1.png", gabarito: "B" },
+{ id: "M090040H6", tema: "D17", url: "imagens/D17/M090040H6.png", gabarito: "C" },
+{ id: "M09143717", tema: "D17", url: "imagens/D17/M09143717.png", gabarito: "C" },
+{ id: "M00030863", tema: "D17", url: "imagens/D17/M00030863.png", gabarito: "B" },
+{ id: "M00033741", tema: "D17", url: "imagens/D17/M00033741.png", gabarito: "C" },
+{ id: "M00099065", tema: "D17", url: "imagens/D17/M00099065.png", gabarito: "B" },
+{ id: "M00102353", tema: "D17", url: "imagens/D17/M00102353.png", gabarito: "C" },
+
+
+{ id: "M00030850", tema: "D29", url: "imagens/D29/M00030850.png", gabarito: "D" },
+{ id: "M00179178", tema: "D29", url: "imagens/D29/M00179178.png", gabarito: "B" },
+{ id: "M023687", tema: "D29", url: "imagens/D29/M023687.png", gabarito: "D" },
+{ id: "M07356717", tema: "D29", url: "imagens/D29/M07356717.png", gabarito: "D" },
+{ id: "M07356917", tema: "D29", url: "imagens/D29/M07356917.png", gabarito: "D" },
+{ id: "M018448", tema: "D29", url: "imagens/D29/M018448.png", gabarito: "D" },
+{ id: "M00034957", tema: "D29", url: "imagens/D29/M00034957.png", gabarito: "B" },
+{ id: "M00098443", tema: "D29", url: "imagens/D29/M00098443.png", gabarito: "D" },
+{ id: "M00102346", tema: "D29", url: "imagens/D29/M00102346.png", gabarito: "D" },
+{ id: "M00131693", tema: "D29", url: "imagens/D29/M00131693.png", gabarito: "C" },
+{ id: "M00132590", tema: "D29", url: "imagens/D29/M00132590.png", gabarito: "A" },
+{ id: "M00179165", tema: "D29", url: "imagens/D29/M00179165.png", gabarito: "A" },
+{ id: "M014174", tema: "D29", url: "imagens/D29/M014174.png", gabarito: "D" },
+{ id: "M018354", tema: "D29", url: "imagens/D29/M018354.png", gabarito: "D" },
+{ id: "M018360", tema: "D29", url: "imagens/D29/M018360.png", gabarito: "D" },
+{ id: "M08017517", tema: "D29", url: "imagens/D29/M08017517.png", gabarito: "B" },
+{ id: "M080691H6", tema: "D29", url: "imagens/D29/M080691H6.png", gabarito: "C" },
+{ id: "M090680ES", tema: "D29", url: "imagens/D29/M090680ES.png", gabarito: "C" },
+{ id: "M091362H6", tema: "D29", url: "imagens/D29/M091362H6.png", gabarito: "D" },
+{ id: "M091808H6", tema: "D29", url: "imagens/D29/M091808H6.png", gabarito: "C" },
+{ id: "M019385", tema: "D29", url: "imagens/D29/M019385.png", gabarito: "D" },
+
+
+{ id: "M00034580", tema: "D15", url: "imagens/D15/M00034580.png", gabarito: "B" },
+{ id: "M00121620", tema: "D15", url: "imagens/D15/M00121620.png", gabarito: "D" },
+{ id: "M017706", tema: "D15", url: "imagens/D15/M017706.png", gabarito: "A" },
+{ id: "M05285117", tema: "D15", url: "imagens/D15/M05285117.png", gabarito: "D" },
+{ id: "M090131H6", tema: "D15", url: "imagens/D15/M090131H6.png", gabarito: "C" },
+{ id: "M090300A9", tema: "D15", url: "imagens/D15/M090300A9.png", gabarito: "B" },
+{ id: "M090884E4", tema: "D15", url: "imagens/D15/M090884E4.png", gabarito: "D" },
+{ id: "M091737H6", tema: "D15", url: "imagens/D15/M091737H6.png", gabarito: "A" },
+{ id: "M00059804", tema: "D15", url: "imagens/D15/M00059804.png", gabarito: "A" },
+{ id: "M00076272", tema: "D15", url: "imagens/D15/M00076272.png", gabarito: "B" },
+{ id: "M00099108", tema: "D15", url: "imagens/D15/M00099108.png", gabarito: "A" },
+{ id: "M00143464", tema: "D15", url: "imagens/D15/M00143464.png", gabarito: "C" },
+{ id: "M00143465", tema: "D15", url: "imagens/D15/M00143465.png", gabarito: "C" },
+{ id: "M017692", tema: "D15", url: "imagens/D15/M017692.png", gabarito: "A" },
+{ id: "M017860", tema: "D15", url: "imagens/D15/M017860.png", gabarito: "D" },
+{ id: "M04005981", tema: "D15", url: "imagens/D15/M04005981.png", gabarito: "D" },
+{ id: "M040091B1", tema: "D15", url: "imagens/D15/M040091B1.png", gabarito: "D" },
+{ id: "M050469H6", tema: "D15", url: "imagens/D15/M050469H6.png", gabarito: "B" },
+{ id: "M051124H6", tema: "D15", url: "imagens/D15/M051124H6.png", gabarito: "C" },
+{ id: "M070253E4", tema: "D15", url: "imagens/D15/M070253E4.png", gabarito: "A" },
+{ id: "M07415117", tema: "D15", url: "imagens/D15/M07415117.png", gabarito: "A" },
+
+
+{ id: "M080387H6", tema: "D30", url: "imagens/D30/M080387H6.png", gabarito: "D" },
+{ id: "M090068H6", tema: "D30", url: "imagens/D30/M090068H6.png", gabarito: "D" },
+{ id: "M091629H6", tema: "D30", url: "imagens/D30/M091629H6.png", gabarito: "B" },
+{ id: "M00030860", tema: "D30", url: "imagens/D30/M00030860.png", gabarito: "C" },
+{ id: "M00056228", tema: "D30", url: "imagens/D30/M00056228.png", gabarito: "B" },
+{ id: "M00080541", tema: "D30", url: "imagens/D30/M00080541.png", gabarito: "C" },
+{ id: "M00102358", tema: "D30", url: "imagens/D30/M00102358.png", gabarito: "B" },
+{ id: "M00102367", tema: "D30", url: "imagens/D30/M00102367.png", gabarito: "B" },
+{ id: "M008349", tema: "D30", url: "imagens/D30/M008349.png", gabarito: "D" },
+{ id: "M013759", tema: "D30", url: "imagens/D30/M013759.png", gabarito: "B" },
+{ id: "M023713", tema: "D30", url: "imagens/D30/M023713.png", gabarito: "C" },
+{ id: "M080858H6", tema: "D30", url: "imagens/D30/M080858H6.png", gabarito: "B" },
+{ id: "M09006217", tema: "D30", url: "imagens/D30/M09006217.png", gabarito: "A" },
+{ id: "M090065ES", tema: "D30", url: "imagens/D30/M090065ES.png", gabarito: "C" },
+{ id: "M090277H6", tema: "D30", url: "imagens/D30/M090277H6.png", gabarito: "A" },
+{ id: "M091567H6", tema: "D30", url: "imagens/D30/M091567H6.png", gabarito: "B" },
+{ id: "M091730H6", tema: "D30", url: "imagens/D30/M091730H6.png", gabarito: "C" },
+{ id: "M091805H6", tema: "D30", url: "imagens/D30/M091805H6.png", gabarito: "B" },
+
+
+{ id: "M00179191", tema: "D20", url: "imagens/D20/M00179191.png", gabarito: "C" },
+{ id: "M070308E4", tema: "D20", url: "imagens/D20/M070308E4.png", gabarito: "A" },
+{ id: "M080092H6", tema: "D20", url: "imagens/D20/M080092H6.png", gabarito: "B" },
+{ id: "M080646H6", tema: "D20", url: "imagens/D20/M080646H6.png", gabarito: "D" },
+{ id: "M090026EX", tema: "D20", url: "imagens/D20/M090026EX.png", gabarito: "B" },
+{ id: "M090707E4", tema: "D20", url: "imagens/D20/M090707E4.png", gabarito: "B" },
+{ id: "M00034953", tema: "D20", url: "imagens/D20/M00034953.png", gabarito: "A" },
+{ id: "M00044047", tema: "D20", url: "imagens/D20/M00044047.png", gabarito: "A" },
+{ id: "M00080536", tema: "D20", url: "imagens/D20/M00080536.png", gabarito: "C" },
+{ id: "M00102277", tema: "D20", url: "imagens/D20/M00102277.png", gabarito: "A" },
+{ id: "M00102319", tema: "D20", url: "imagens/D20/M00102319.png", gabarito: "C" },
+{ id: "M00102328", tema: "D20", url: "imagens/D20/M00102328.png", gabarito: "D" },
+{ id: "M00126050", tema: "D20", url: "imagens/D20/M00126050.png", gabarito: "D" },
+{ id: "M00131705", tema: "D20", url: "imagens/D20/M00131705.png", gabarito: "C" },
+{ id: "M019370", tema: "D20", url: "imagens/D20/M019370.png", gabarito: "C" },
+
+
+{ id: "M018617", tema: "D21", url: "imagens/D21/M018617.png", gabarito: "C" },
+{ id: "M05021917", tema: "D21", url: "imagens/D21/M05021917.png", gabarito: "C" },
+{ id: "M00034275", tema: "D21", url: "imagens/D21/M00034275.png", gabarito: "D" },
+{ id: "M00034283", tema: "D21", url: "imagens/D21/M00034283.png", gabarito: "A" },
+{ id: "M00131706", tema: "D21", url: "imagens/D21/M00131706.png", gabarito: "B" },
+{ id: "M00132594", tema: "D21", url: "imagens/D21/M00132594.png", gabarito: "C" },
+{ id: "M00143478", tema: "D21", url: "imagens/D21/M00143478.png", gabarito: "C" },
+{ id: "M013355", tema: "D21", url: "imagens/D21/M013355.png", gabarito: "B" },
+{ id: "M014326", tema: "D21", url: "imagens/D21/M014326.png", gabarito: "B" },
+{ id: "M018603", tema: "D21", url: "imagens/D21/M018603.png", gabarito: "C" },
+{ id: "M024964", tema: "D21", url: "imagens/D21/M024964.png", gabarito: "C" },
+{ id: "M026891", tema: "D21", url: "imagens/D21/M026891.png", gabarito: "B" },
+{ id: "M050103EX", tema: "D21", url: "imagens/D21/M050103EX.png", gabarito: "A" },
+{ id: "M090021EJ", tema: "D21", url: "imagens/D21/M090021EJ.png", gabarito: "A" },
+{ id: "M090085H6", tema: "D21", url: "imagens/D21/M090085H6.png", gabarito: "D" },
+{ id: "M091526H6", tema: "D21", url: "imagens/D21/M091526H6.png", gabarito: "A" },
+{ id: "M091564H6", tema: "D21", url: "imagens/D21/M091564H6.png", gabarito: "B" },
+
+
+{ id: "M00134066", tema: "D32", url: "imagens/D32/M00134066.png", gabarito: "C" },
+{ id: "M091541H6", tema: "D32", url: "imagens/D32/M091541H6.png", gabarito: "C" },
+{ id: "M091555H6", tema: "D32", url: "imagens/D32/M091555H6.png", gabarito: "C" },
+{ id: "M00030852", tema: "D32", url: "imagens/D32/M00030852.png", gabarito: "C" },
+{ id: "M00034525", tema: "D32", url: "imagens/D32/M00034525.png", gabarito: "B" },
+{ id: "M00102285", tema: "D32", url: "imagens/D32/M00102285.png", gabarito: "C" },
+{ id: "M00102327", tema: "D32", url: "imagens/D32/M00102327.png", gabarito: "B" },
+{ id: "M00102338", tema: "D32", url: "imagens/D32/M00102338.png", gabarito: "A" },
+{ id: "M00102370", tema: "D32", url: "imagens/D32/M00102370.png", gabarito: "C" },
+{ id: "M00131691", tema: "D32", url: "imagens/D32/M00131691.png", gabarito: "B" },
+{ id: "M00179164", tema: "D32", url: "imagens/D32/M00179164.png", gabarito: "D" },
+{ id: "M061056H6", tema: "D32", url: "imagens/D32/M061056H6.png", gabarito: "B" },
+{ id: "M090434H6", tema: "D32", url: "imagens/D32/M090434H6.png", gabarito: "B" },
+{ id: "M091803H6", tema: "D32", url: "imagens/D32/M091803H6.png", gabarito: "D" },
+
+
+{ id: "M00179188", tema: "D09", url: "imagens/D09/M00179188.png", gabarito: "D" },
+{ id: "M07375517", tema: "D09", url: "imagens/D09/M07375517.png", gabarito: "A" },
+{ id: "M080089E4", tema: "D09", url: "imagens/D09/M080089E4.png", gabarito: "A" },
+{ id: "M091809H6", tema: "D09", url: "imagens/D09/M091809H6.png", gabarito: "A" },
+{ id: "M00030855", tema: "D09", url: "imagens/D09/M00030855.png", gabarito: "D" },
+{ id: "M00030866", tema: "D09", url: "imagens/D09/M00030866.png", gabarito: "C" },
+{ id: "M00080547", tema: "D09", url: "imagens/D09/M00080547.png", gabarito: "B" },
+{ id: "M00102340", tema: "D09", url: "imagens/D09/M00102340.png", gabarito: "B" },
+{ id: "M015478", tema: "D09", url: "imagens/D09/M015478.png", gabarito: "C" },
+{ id: "M05181117", tema: "D09", url: "imagens/D09/M05181117.png", gabarito: "A" },
+{ id: "M070071H6", tema: "D09", url: "imagens/D09/M070071H6.png", gabarito: "A" },
+{ id: "M090936E4", tema: "D09", url: "imagens/D09/M090936E4.png", gabarito: "A" },
+{ id: "M091399H6", tema: "D09", url: "imagens/D09/M091399H6.png", gabarito: "B" },
+{ id: "M091734H6", tema: "D09", url: "imagens/D09/M091734H6.png", gabarito: "B" },
+
+
 { id: "M091915H6", tema: "D16", url: "imagens/D16/M091915H6.png", gabarito: "C" },
 { id: "M090380H6", tema: "D16", url: "imagens/D16/M090380H6.png", gabarito: "D" },
 { id: "M00179158", tema: "D16", url: "imagens/D16/M00179158.png", gabarito: "B" },
@@ -621,6 +872,16 @@
 { id: "M00030869", tema: "D33", url: "imagens/D33/M00030869.png", gabarito: "D" },
 { id: "M008334", tema: "D33", url: "imagens/D33/M008334.png", gabarito: "D" },
 { id: "M019368", tema: "D33", url: "imagens/D33/M019368.png", gabarito: "C" },
+
+
+{ id: "M09057617", tema: "D04", url: "imagens/D04/M09057617.png", gabarito: "C" },
+{ id: "M00039092", tema: "D04", url: "imagens/D04/M00039092.png", gabarito: "D" },
+{ id: "M00179146", tema: "D04", url: "imagens/D04/M00179146.png", gabarito: "B" },
+{ id: "M050038H6", tema: "D04", url: "imagens/D04/M050038H6.png", gabarito: "C" },
+{ id: "M05021017", tema: "D04", url: "imagens/D04/M05021017.png", gabarito: "A" }
+{ id: "M070250E4", tema: "D04", url: "imagens/D04/M070250E4.png", gabarito: "D" },
+{ id: "M090177G5", tema: "D04", url: "imagens/D04/M090177G5.png", gabarito: "A" },
+{ id: "M09043117", tema: "D04", url: "imagens/D04/M09043117.png", gabarito: "C" },
 
 
 { id: "M00034199", tema: "D18", url: "imagens/D18/M00034199.png", gabarito: "D" },
