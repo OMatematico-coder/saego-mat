@@ -106,10 +106,10 @@
 
 	/* Modal de Revisão de Questão */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
-        .modal-content { background: white; border-radius: 8px; width: 100%; max-width: 700px; max-height: 95vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .modal-content { background: white; border-radius: 8px; width: 100%; max-width: 1000px; max-height: 95vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
         .modal-header { padding: 15px 20px; background: var(--primary); color: white; display: flex; justify-content: space-between; align-items: center; font-size: 18px; font-weight: bold; }
         .modal-body { padding: 20px; overflow-y: auto; text-align: center; background: #f9fafb; }
-        .modal-body img { max-width: 100%; max-height: 50vh; object-fit: contain; margin-bottom: 20px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .modal-body img { max-width: 100%; max-height: 70vh; object-fit: contain; margin-bottom: 20px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .modal-footer { padding: 15px 20px; border-top: 1px solid #e5e7eb; text-align: right; background: white; }
         .btn-close { background: #6b7280; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; }
         .btn-close:hover { background: #4b5563; }
@@ -362,7 +362,7 @@
     const URL_GOOGLE_SCRIPT = "https://script.google.com/macros/s/AKfycbwt1lmARd7SeHFhb7jOmrhPwxbffIIadggWe5P3i-r1cedBvvDNbuWHOiMw2e8o5A8tuQ/exec";
 
     const configuracaoTemas = [
-        { nivel: 1, id: "D36", nome: "Resolver problema com informações em gráficos ou tabelas", qtd_questoes: 8, capa: "capas/capa_d36.png" },
+        { nivel: 1, id: "D36", nome: "Resolver problema com gráficos ou tabelas", qtd_questoes: 8, capa: "capas/capa_d36.png" },
 
         { nivel: 2, id: "D28", nome: "Resolver problema com porcentagem", qtd_questoes: 8, capa: "capas/capa_d28.png" },
 
@@ -374,11 +374,11 @@
 
         { nivel: 6, id: "D14", nome: "Resolver problema envolvendo volume", qtd_questoes: 7, capa: "capas/capa_d14.png" },
 
-	{ nivel: 7, id: "D17", nome: "Identificar a localização de números racionais na reta numérica", qtd_questoes: 7, capa: "capas/capa_d17.png" },
+	{ nivel: 7, id: "D17", nome: "Identificar a localização de racionais na reta", qtd_questoes: 7, capa: "capas/capa_d17.png" },
 
-        { nivel: 8, id: "D29", nome: "Resolver problema que envolva variação proporcional entre grandezas", qtd_questoes: 7, capa: "capas/capa_d29.png" },
+        { nivel: 8, id: "D29", nome: "Resolver problema com variação proporcional", qtd_questoes: 7, capa: "capas/capa_d29.png" },
 
-        { nivel: 9, id: "D15", nome: "Resolver problema utilizando relações entre diferentes unidades de medida", qtd_questoes: 7, capa: "capas/capa_d15.png" },
+        { nivel: 9, id: "D15", nome: "Resolver problema utilizando diferentes unidades", qtd_questoes: 7, capa: "capas/capa_d15.png" },
 
 	{ nivel: 10, id: "D30", nome: "Calcular o valor numérico de uma expressão algébrica", qtd_questoes: 6, capa: "capas/capa_d30.png" },
 
@@ -388,17 +388,17 @@
 
 	{ nivel: 13, id: "D12", nome: "Resolver problema com perímetro", qtd_questoes: 7, capa: "capas/capa_d12.png" },
 
-	{ nivel: 14, id: "D32", nome: "Identificar a expressão algébrica que expressa sequência de números ou figuras", qtd_questoes: 7, capa: "capas/capa_d32.png" },
+	{ nivel: 14, id: "D32", nome: "Identificar a expressão algébrica de uma sequência", qtd_questoes: 7, capa: "capas/capa_d32.png" },
 
-	{ nivel: 15, id: "D09", nome: "Interpretar informações apresentadas por coordenadas cartesianas.", qtd_questoes: 7, capa: "capas/capa_d09.png" },
+	{ nivel: 15, id: "D09", nome: "Interpretar informações com coordenadas cartesianas.", qtd_questoes: 7, capa: "capas/capa_d09.png" },
 
-	{ nivel: 16, id: "D16", nome: "Identificar a localização de números inteiros na reta numérica", qtd_questoes: 7, capa: "capas/capa_d16.png" },
+	{ nivel: 16, id: "D16", nome: "Identificar a localização de inteiros na reta", qtd_questoes: 7, capa: "capas/capa_d16.png" },
 
         { nivel: 17, id: "D34", nome: "Identificar um sistema de equações do 1º grau", qtd_questoes: 6, capa: "capas/capa_d34.png" },
 
         { nivel: 18, id: "D08", nome: "Resolver problema utilizando propriedades dos polígonos", qtd_questoes: 5, capa: "capas/capa_d08.png" },
 
-	{ nivel: 19, id: "D22", nome: "Identificar fração como representação associada a diferentes significados.", qtd_questoes: 6, capa: "capas/capa_d22.png" },
+	{ nivel: 19, id: "D22", nome: "Identificar fração em diferentes significados.", qtd_questoes: 6, capa: "capas/capa_d22.png" },
 
         { nivel: 20, id: "D02", nome: "Identificar e relacionar planificações", qtd_questoes: 6, capa: "capas/capa_d02.png" },
 
@@ -406,7 +406,7 @@
 
 	{ nivel: 22, id: "D33", nome: "Identificar uma equação ou inequação do 1º grau", qtd_questoes: 6, capa: "capas/capa_d33.png" },
 
-	{ nivel: 23, id: "D04", nome: "Identificar relação entre quadriláteros e suas propriedades.", qtd_questoes: 4, capa: "capas/capa_d04.png" },
+	{ nivel: 23, id: "D04", nome: "Identificar quadriláteros e suas propriedades.", qtd_questoes: 4, capa: "capas/capa_d04.png" },
 
         { nivel: 24, id: "D18", nome: "Efetuar cálculos com números inteiros", qtd_questoes: 5, capa: "capas/capa_d18.png" },
 
