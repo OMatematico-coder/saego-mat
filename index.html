@@ -1382,6 +1382,7 @@
         
         // Em breve usaremos o parâmetro turma no fetch, mas vamos buscar os dados primeiro
         fetch(`${URL_GOOGLE_SCRIPT}?acao=painel_professor`).then(r=>r.json()).then(data => {
+	    
 	    dadosGlobaisAdmin = data;
             
             // 1. Preenchendo os KPIs Globais
