@@ -1010,7 +1010,7 @@
                 dadosAluno.nome = data.nome; dadosAluno.turma = data.turma; dadosAluno.usuario = u;
                 nivelLiberadoAluno = data.nivelLiberado || 1; 
                 historicoAluno = data.historicoNotas || {};
-                document.getElementById('dash-title').innerText = `Olá, ${data.nome.split(" ")[0]}!`;
+                document.getElementById('dash-title').innerText = `Olá, ${data.nome}!`;
                 mudarTela('screen-dashboard');
             } else { alert(data.erro); mudarTela('screen-login'); }
         }).catch(() => { alert("Erro de rede."); mudarTela('screen-login'); });
@@ -1525,6 +1525,10 @@
             }
         }
         document.getElementById('modal-admin-detalhes').style.display = 'flex';
+    }
+
+    function fecharModalAdmin() {
+        document.getElementById('modal-admin-detalhes').style.display = 'none';
     }
 
     function mudarTela(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
