@@ -4,7 +4,7 @@
     <link rel="manifest" href="manifest.json">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulado Online v2.0 - Missões Expandidas</title>
+    <title>Simulado Online v2.0</title>
     <style>
         :root {
             --primary: #2563eb;
@@ -1540,61 +1540,7 @@
         });
     }
 
-    // ==========================================
-    // FUNÇÕES DO MODAL ADMIN (INTERATIVIDADE)
-    // ==========================================
-    function abrirModalAdmin(tipo, parametro = null) {
-        if (!dadosGlobaisAdmin) return;
-        
-        const thead = document.getElementById('modal-admin-thead');
-        const tbody = document.getElementById('modal-admin-tbody');
-        const titulo = document.getElementById('modal-admin-titulo');
-        
-        thead.innerHTML = ""; tbody.innerHTML = "";
-        
-        if (tipo === 'ativos' || tipo === 'inativos') {
-            titulo.innerText = tipo === 'ativos' ? "Alunos Ativos (Já jogaram)" : "Alunos Inativos (Nunca jogaram)";
-            thead.innerHTML = "<tr><th>Nome do Aluno</th><th>Turma</th><th>Usuário</th></tr>";
-            
-            let lista = tipo === 'ativos' ? dadosGlobaisAdmin.listaAtivos : dadosGlobaisAdmin.listaInativos;
-            
-            if (lista.length === 0) {
-                tbody.innerHTML = "<tr><td colspan='3' style='text-align:center;'>Nenhum aluno nesta lista.</td></tr>";
-            } else {
-                lista.forEach(aluno => {
-                    tbody.innerHTML += `<tr><td>${aluno.nome}</td><td>${aluno.turma}</td><td>${aluno.usuario}</td></tr>`;
-                });
-            }
-        } 
-        else if (tipo === 'tema') {
-            titulo.innerText = `Detalhes das Missões: ${parametro}`;
-            thead.innerHTML = "<tr><th>Data</th><th>Aluno</th><th>Turma</th><th>Fase</th><th>Nota</th><th>Tempo</th></tr>";
-            
-            let testes = dadosGlobaisAdmin.detalhesTemas[parametro] || [];
-            
-            if (testes.length === 0) {
-                tbody.innerHTML = "<tr><td colspan='6' style='text-align:center;'>Nenhuma missão registrada para este tema.</td></tr>";
-            } else {
-                testes.forEach(t => {
-                    let infoTempo = formatarTempoSegundos(t.tempo);
-                    let corNota = t.nota >= 6 ? '#10b981' : '#ef4444';
-                    tbody.innerHTML += `<tr>
-                        <td>${t.data}</td><td>${t.nome}</td><td>${t.turma}</td>
-                        <td>${t.fase}</td><td style="font-weight:bold; color:${corNota};">${t.nota.toFixed(1)}</td><td>${infoTempo}</td>
-                    </tr>`;
-                });
-            }
-        }
-        
-        document.getElementById('modal-admin-detalhes').style.display = 'flex';
-    }
-
-    function fecharModalAdmin() {
-        document.getElementById('modal-admin-detalhes').style.display = 'none';
-    }
-
-
-</script>
+    </script>
 
 </body>
 </html>
