@@ -1383,6 +1383,7 @@
 
     // Função de carregamento do Painel Atualizada
     // Função atualizada para enviar o filtro de turma
+    // Função atualizada de carregamento do Painel
     function carregarPainelProfessor(turmaAlvo = 'Todas') {
         mudarTela('screen-loading');
         
@@ -1398,8 +1399,11 @@
             document.getElementById('kpi-desvio').innerText = data.desvioPadrao;
             document.getElementById('kpi-tempo').innerText = formatarTempoSegundos(data.tempoMedioSegundos);
             
-            // Proficiência por Tema
-            <div class="kpi-card" style="cursor: pointer; text-align: left;" title="Ver detalhes" onclick="abrirModalAdmin('tema', '${desc.tema}')">
+            // Proficiência por Tema (Agora com Tempo Médio)
+            const gridTemas = document.getElementById('kpi-descritores'); gridTemas.innerHTML = "";
+            data.descritores.forEach(desc => {
+                gridTemas.innerHTML += `
+                <div class="kpi-card" style="cursor: pointer; text-align: left;" title="Ver detalhes" onclick="abrirModalAdmin('tema', '${desc.tema}')">
                     <div style="font-weight: bold; color: var(--text); font-size: 16px;">${desc.tema}</div>
                     <div style="display: flex; justify-content: space-between; margin-top: 10px;">
                         <span style="font-size: 14px; color: #6b7280;">Média: <b style="color: #10b981;">${desc.media}</b></span>
@@ -1411,7 +1415,7 @@
                 </div>`;
             });
 
-            // NOVO: Cards de Proficiência Individual dos Alunos
+            // Cards de Proficiência Individual dos Alunos
             const gridAlunos = document.getElementById('kpi-alunos-cards'); gridAlunos.innerHTML = "";
             data.listaAtivos.forEach(aluno => {
                 gridAlunos.innerHTML += `
@@ -1425,7 +1429,7 @@
                 </div>`;
             });
             
-            // Tabela de Últimas Atividades com botão de exclusão
+            // Tabela de Últimas Atividades
             const tab = document.getElementById('kpi-tabela-atividades'); tab.innerHTML = "";
             data.atividades.forEach(a => { 
                 let infoTempo = formatarTempoSegundos(a.tempo);
